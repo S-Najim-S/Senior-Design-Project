@@ -1,0 +1,36 @@
+body{
+
+}
+
+a {
+  display: inline-block;
+  text-align: right;
+  text-decoration: none;
+  color: #555;
+  font-size: 0.9rem;
+  transition: .3s;
+}
+
+a:hover {
+  color: #3a9c3a;
+}
+.dropdown-menu{
+  text-align: center;
+}
+
+.join-img img{
+  border-radius: 20px;
+  margin: 5px;
+}
+.join-img{
+  margin-top: 7px;
+}
+.joinbtn{
+  margin-top:1.7%;
+}
+.joinheader p{
+  color: #acc0ac;
+}
+.card{
+  margin-top: 10px;
+}
