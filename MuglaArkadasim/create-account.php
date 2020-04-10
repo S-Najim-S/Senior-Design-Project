@@ -3,53 +3,66 @@
 
   $pdo = new PDO('mysql:127.0.0.1=localhost;dbname=SocialNetwork;chartset=utf8', 'root', '');
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $errors = array();
+  $success = array();
+  $username = '';
+  $email = '';
+  $type = '';
+  $gender = '';
 
   if (isset($_POST['createaccount'])) {
-    $fname = $_POST['fullname'];
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $gender = $_POST['gender'];
-    $type = $_POST['type'];
+      $username = $_POST['username'];
+      $email = $_POST['email'];
+      $password = $_POST['password'];
+      $gender = $_POST['gender'];
+      $type = $_POST['type'];
+      $confPassword = $_POST['coPassword'];
 
-    // Check if user exists
-    if (!DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$username))){
 
+      // Check if user exists
+      if (!DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$username))) {
+
+          //check if email already exists
+          if (!DB::query('SELECT email FROM users WHERE email=:email', array(':email'=>$email))) {
 
           // Check length of the username
-          if(strlen($username) >=3 && strlen($username)<=32){
+              if (strlen($username) >=6 && strlen($username)<=32) {
 
               // Check if username is consist of valid charachters
-              if(preg_match('/[a-zA-Z0-9_]+/', $username)){
+                  if (preg_match('/^[a-zA-Z0-9_]*$/', $username)) {
 
                   // Passwords consisting of minimum charachters
-                  if (strlen($password) >=8 && strlen($password)<=60) {
+                      if (strlen($password) >=8 && strlen($password)<=60) {
+
+                          if ($password == $confPassword) {
 
                       // Check if E-mail is valid
-                      if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+                          if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
-          // Insert Fields into the database and the password as hash value
-          DB::query('INSERT INTO users VALUES(\'\',:fname, :username, :email, :password, :gender, :type)',array(':fname'=>$fname,':username'=>$username,':email'=>$email,':password'=>password_hash($password,PASSWORD_BCRYPT),':gender'=>$gender,':type'=>$type));
-          echo "Success";
-        } else {
-          echo "Invalid e-mail!";
-        }
-      }else {
-        echo "Invalid password length!";
-      }
+                        // Insert Fields into the database and the password as hash value
+                              DB::query('INSERT INTO users VALUES(\'\', :username, :email, :password, :gender, :type)', array(':username'=>$username,':email'=>$email,':password'=>password_hash($password, PASSWORD_BCRYPT),':gender'=>$gender,':type'=>$type));
+                          } else {
+                              $errors['email'] = "Invalid e-mail";
+                          }
+                      } else {
+                          $errors['coPassword'] = "Passwords does not match";
+                      }
+                    }else {
+                      $errors['password'] = "invalid Passwords length";
+                    }
+                  } else {
+                      $errors['username'] = "Invalid characters in username";
+                  }
 
-        } else {
-          echo "Invalid characters in Username!";
-        }
-
-        } else {
-          echo "Invalid length Username!";
-        }
-
+              } else {
+                  $errors['username'] = "Invalid in user length";
+              }
+          } else {
+              $errors['email'] = "email already exists";
+          }
       } else {
-        echo "User already exists!";
+          $errors['username'] = "User already exists";
       }
-
   }
  ?>
 
@@ -75,27 +88,40 @@
         <!-- <img src="img/avatar.svg"> -->
         <div class="textpartc">
           <h3>MuglaArkadasim</h3>
-
           <h4 id="leftp">Sign up to get updates about events happening around you</h4>
         </div>
+
+        <!-- popup error message if there is any error in the array -->
+        <?php if (count($errors) >0): ?>
+        <div class="alert alert-danger">
+        <?php foreach ($errors as $error): ?>
+          <li><?php echo $error; ?></li>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+
+      <?php if (count($errors) === 0): ?>
+      <div class="alert alert-success">
+        <li><?php echo "Account created"; ?></li>
+    </div>
+    <?php endif;?>
+
+
         <div class="input-div one">
           <div class="i">
             <i class="fas fa-user"></i>
           </div>
           <div class="div">
-            <h5>FullName</h5>
-            <input type="text" name="fullname" value="" class="input">
+            <input type="text" name="username" value="<?php echo $username ?>" class="input" placeholder="Username" required>
           </div>
         </div>
 
-
         <div class="input-div one">
           <div class="i">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-envelope-open-text"></i>
           </div>
-          <div class="div">
-            <h5>Username</h5>
-            <input type="text" name="username" value="" class="input">
+          <div class="div" id="email">
+            <input type="email" name="email"class="input"  value="<?php echo $email ?>"placeholder="E-mail" required>
           </div>
         </div>
 
@@ -104,36 +130,32 @@
             <i class="fas fa-lock"></i>
           </div>
           <div class="div">
-            <h5>Password</h5>
-            <input type="password" name="password" class="input">
+            <input type="password" name="password" class="input" placeholder="Password" required>
           </div>
         </div>
 
-
-        <div class="input-div one">
+        <div class="input-div pass">
           <div class="i">
-            <i class="fas fa-envelope-open-text"></i>
+            <i class="fas fa-lock"></i>
           </div>
-          <div class="div" id="email">
-            <h5>E-Mail</h5>
-            <input type="text" name="email"class="input">
+          <div class="div">
+            <input type="password" name="coPassword" placeholder="Confirm password" class="input" required>
           </div>
         </div>
 
         <div class="gender">
-          <input type="radio"  name="gender" id="male" value="male" >
+          <input type="radio"  name="gender" id="male" value="male" required>
           <label for="male" >Male</label>
-
-          <input type="radio"  name="gender" id="female" value="female">
+          <input type="radio"  name="gender" id="female" value="female" required>
           <label for="female" >Female</label>
 
         </div>
 
         <div class="userType">
-          <input type="radio"  name="type" id="teacher" value="teacher" >
+          <input type="radio"  name="type" id="teacher" value="teacher" required>
           <label for="teacher" >Teacher</label>
 
-          <input type="radio"  name="type" id="student" value="student">
+          <input type="radio"  name="type" id="student" value="student" required>
           <label for="student" >Student</label>
 
         </div>
