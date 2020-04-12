@@ -23,6 +23,8 @@ if (isset($_POST['login'])) {
                         setcookie("SNID", $token, time() + 60 * 60 * 24 * 7,'/' , NULL, NULL, TRUE );
                         // After 3 days the cookie expires and forces user to ask for a new cookie
                         setcookie("SNID_", '1', time() +60 * 60 * 24 * 3, '/', NULL, NULL, True);
+
+                        header('Location:homepage.php');
                 } else {
                         $errors['password'] = 'Incorrect password';
 
@@ -54,7 +56,7 @@ if (isset($_POST['login'])) {
       <img src="img/background.svg">
     </div>
     <div class="login-content">
-      <form action="login.php" method="post">
+      <form action="loginPage.php" method="post">
         <!-- <img src="img/avatar.svg"> -->
           <div class="textpart">
           <h4>Welcome to</h4>

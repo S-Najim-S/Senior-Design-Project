@@ -103,6 +103,8 @@
       <?php if (count($errors) === 0): ?>
       <div class="alert alert-success">
         <li><?php echo "Account created"; ?></li>
+        <?php $username = '';
+        $email = ''; ?>
     </div>
     <?php endif;?>
 
@@ -121,9 +123,10 @@
             <i class="fas fa-envelope-open-text"></i>
           </div>
           <div class="div" id="email">
-            <input type="email" name="email"class="input"  value="<?php echo $email ?>"placeholder="E-mail" required>
+            <input type="email" name="email"class="input"  value="<?php echo $email ?>"placeholder="University email address" required>
           </div>
         </div>
+
 
         <div class="input-div pass">
           <div class="i">
