@@ -3,12 +3,12 @@
   include('./classes/DB.php');
   include('./classes/Login.php');
 
-  Using Login:: to refrence the function
+  // Using Login:: to refrence the function
   if (Login::isLoggedIn()) {
-    echo "Logged in ";
-    echo Login::isLoggedIn();
+    // echo "Logged in ";
+    // echo Login::isLoggedIn();
   } else {
-    echo "Not Logged in ";
+    die("Not Logged in 226");
   }
 
 

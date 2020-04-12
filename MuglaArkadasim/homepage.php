@@ -1,13 +1,10 @@
 <?php
   include('./classes/DB.php');
   include('./classes/Login.php');
-  error_reporting(0);
-  $link2 = $_GET['pageSet'];
   if (!Login::isLoggedIn()) {
       die("You are not logged in, for access please login!");
   }
-      $link2 = $_GET['pageSet'];
-        if ( $link2) {
+        if ( isset($_GET['pageSet'])) {
             if (isset($_COOKIE['SNID'])) {
                 DB::query('DELETE FROM login_tokens WHERE token=:token', array(':token'=>sha1($_COOKIE['SNID'])));
             }

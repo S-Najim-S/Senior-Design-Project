@@ -4,7 +4,7 @@
   $pdo = new PDO('mysql:127.0.0.1=localhost;dbname=SocialNetwork;chartset=utf8', 'root', '');
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   $errors = array();
-  $success = array();
+  $success = false;
   $username = '';
   $email = '';
   $type = '';
@@ -41,6 +41,7 @@
 
                         // Insert Fields into the database and the password as hash value
                               DB::query('INSERT INTO users VALUES(\'\', :username, :email, :password, :gender, :type)', array(':username'=>$username,':email'=>$email,':password'=>password_hash($password, PASSWORD_BCRYPT),':gender'=>$gender,':type'=>$type));
+                              $success = true;
                           } else {
                               $errors['email'] = "Invalid e-mail";
                           }
@@ -100,9 +101,9 @@
       </div>
       <?php endif; ?>
 
-      <?php if (count($errors) === 0): ?>
+      <?php if ($success): ?>
       <div class="alert alert-success">
-        <li><?php echo "Account created"; ?></li>
+        <li><?php echo "Check". $email. ", and verify to login"; ?></li>
         <?php $username = '';
         $email = ''; ?>
     </div>
