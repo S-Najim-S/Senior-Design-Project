@@ -8,7 +8,7 @@
     // echo "Logged in ";
     // echo Login::isLoggedIn();
   } else {
-    die("Not Logged in 226");
+    die("Not Logged in");
   }
 
 
