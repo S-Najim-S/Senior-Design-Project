@@ -1,7 +1,7 @@
 <?php
   include('classes/DB.php');
 
-  $pdo = new PDO('mysql:127.0.0.1=localhost;dbname=SocialNetwork;chartset=utf8', 'root', '');
+  $pdo = new PDO('mysql:127.0.0.1=localhost;dbname=mynetwork;chartset=utf8', 'root', '');
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   $errors = array();
   $success = false;

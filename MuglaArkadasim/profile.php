@@ -1,21 +1,51 @@
 <?php
+
   include('./classes/DB.php');
   include('./classes/Login.php');
-  if (!Login::isLoggedIn()) {
-      die("You are not logged in, for access please login!");
-  }
-        if ( isset($_GET['pageSet'])) {
-            if (isset($_COOKIE['SNID'])) {
-                DB::query('DELETE FROM login_tokens WHERE token=:token', array(':token'=>sha1($_COOKIE['SNID'])));
-            }
-            // expires the cookies and the user gets logged out
-            setcookie('SNID', '1', time()-3600);
-            setcookie('SNID_', '1', time()-3600);
-            header('Location:loginPage.php');
 
-        }
+  $username = '';
+  $isFollowing = false;
 
- ?>
+  // Check the link if the username is passed
+  if (isset($_GET['username'])) {
+      if (DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$_GET['username']))) {
+          $username = DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$_GET['username']))[0]['username'];
+          $userid = DB::query('SELECT id FROM users WHERE username=:username', array(':username'=>$_GET['username']))[0]['id'];
+          $followerid = Login::isLoggedIn();
+
+          if (isset($_POST['follow'])) {
+
+                       if ($userid != $followerid) {
+
+                               if (!DB::query('SELECT follower_id FROM followers WHERE user_id=:userid', array(':userid'=>$userid))) {
+                                       DB::query('INSERT INTO followers VALUES (\'\', :userid, :followerid)', array(':userid'=>$userid, ':followerid'=>$followerid));
+                               } else {
+                                       echo 'Already following!';
+                               }
+                               $isFollowing = True;
+                       }
+               }
+               if (isset($_POST['unfollow'])) {
+
+                       if ($userid != $followerid) {
+
+                               if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid', array(':userid'=>$userid))) {
+                                       DB::query('DELETE FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid));
+                               }
+                               $isFollowing = False;
+                       }
+               }
+               if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid', array(':userid'=>$userid))) {
+                       //echo 'Already following!';
+                       $isFollowing = True;
+               }
+
+       } else {
+               die('User not found!');
+       }
+}
+
+?>
 
 <!DOCTYPE html>
 <html>
@@ -42,7 +72,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="userTimeline.html"><i class=" usercircle far fa-user-circle fa-lg"></i> User_name</a>
+            <a class="nav-link" href="userTimeline.html"><i class=" usercircle far fa-user-circle fa-lg"></i> <?php echo $username ?></a>
           </li>
           <li class="nav-item ">
             <a class="nav-link" href="joinClub.html">Clubs</a>
@@ -80,7 +110,6 @@
       </div>
     </nav>
   </div>
-
   <div class="container" style="display:block; text-align:center;">
     <div class="col-md-7" style="display:inline-block; margin-top:50px; margin-right:9%;">
       <textarea class="form-control description" name="description" id="description" placeholder="Wanna Share Something?" rows="3" autocomplete="off" required=""></textarea>
@@ -238,8 +267,23 @@
       </div>
       <div class="col-sm-3 right-box">
 
-        <div class="card" >
+        <form class="" action="profile.php?username=<?php echo $username;?>" method="post">
+          <?php
+          if($userid != $followerid){
+            if ($isFollowing) {
+                echo '<div class="d-flex flex-wrap justify-content-between align-items-center col-sm" style="margin-bottom:10px; margin-left:15px;">';
+                echo '<input type="submit" name="unfollow" value="          Unfollow          " class="btn btn-style-1 btn-success">';
+                echo '</div>';
+            } else {
+              echo '<div class="d-flex flex-wrap justify-content-between align-items-center col-sm" style="margin-bottom:10px; margin-left:15px;">';
+              echo '<input type="submit" name="follow" value="            Follow          " class="btn btn-style-1 btn-success">';
+              echo '</div>';
+            }
+            }
+           ?>
+        </form>
 
+        <div class="card" >
           <div class="chat-groups">
             <h6 style="margin-top:10px; color:#3a9c3a;">My Chatrooms</h6>
             <hr>

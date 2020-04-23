@@ -184,14 +184,14 @@
 
           <div class="col-md-6">
             <div class="form-group">
-              <label for="account-fn">new password</label>
+              <label for="account-fn">New password</label>
               <input class="form-control" name="newpassword" type="password" >
             </div>
           </div>
 
           <div class="col-md-6">
             <div class="form-group">
-              <label for="account-fn">Old password</label>
+              <label for="account-fn">Confirm password</label>
               <input class="form-control" name="confirmpassword" type="password" >
             </div>
           </div>
