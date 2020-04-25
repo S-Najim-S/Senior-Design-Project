@@ -24,7 +24,7 @@ if (isset($_POST['login'])) {
                         // After 3 days the cookie expires and forces user to ask for a new cookie
                         setcookie("SNID_", '1', time() +60 * 60 * 24 * 3, '/', NULL, NULL, True);
 
-                        header('Location:homepage.php');
+                        header('Location:profile.php');
                 } else {
                         $errors['password'] = 'Incorrect password';
 

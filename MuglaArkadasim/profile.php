@@ -5,6 +5,8 @@
 
   $username = '';
   $isFollowing = false;
+  $loggedInUserId = Login::isLoggedIn();
+
 
   // Check the link if the username is passed
   if (isset($_GET['username'])) {
@@ -14,39 +16,50 @@
           $followerid = Login::isLoggedIn();
 
           if (isset($_POST['follow'])) {
+              if ($userid != $followerid) {
+                  if (!DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
+                      DB::query('INSERT INTO followers VALUES (\'\', :userid, :followerid)', array(':userid'=>$userid, ':followerid'=>$followerid));
+                  } else {
+                      echo 'Already following!';
+                  }
+                  $isFollowing = true;
+              }
+          }
+          if (isset($_POST['unfollow'])) {
+              if ($userid != $followerid) {
+                  if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
+                      DB::query('DELETE FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid));
+                  }
+                  $isFollowing = false;
+              }
+          }
+          if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
+              //echo 'Already following!';
+              $isFollowing = true;
+          }
 
-                       if ($userid != $followerid) {
+          if (isset($_POST['post'])) {
+              $postBody = $_POST['postbody'];
 
-                               if (!DB::query('SELECT follower_id FROM followers WHERE user_id=:userid', array(':userid'=>$userid))) {
-                                       DB::query('INSERT INTO followers VALUES (\'\', :userid, :followerid)', array(':userid'=>$userid, ':followerid'=>$followerid));
-                               } else {
-                                       echo 'Already following!';
-                               }
-                               $isFollowing = True;
-                       }
-               }
-               if (isset($_POST['unfollow'])) {
+              if (strlen($postBody) > 240 || strlen($postBody) < 1) {
+                  die("incorrect length!");
+              }
 
-                       if ($userid != $followerid) {
+              // if the logged in user is the one who is tryin to post then query
 
-                               if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid', array(':userid'=>$userid))) {
-                                       DB::query('DELETE FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid));
-                               }
-                               $isFollowing = False;
-                       }
-               }
-               if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid', array(':userid'=>$userid))) {
-                       //echo 'Already following!';
-                       $isFollowing = True;
-               }
+                DB::query('INSERT INTO posts VALUES(\'\', :postbody, NOW(), :userid, 0)', array(':postbody'=>$postBody, ':userid'=>$userid));
 
-       } else {
-               die('User not found!');
-       }
-}
+          }
+
+          // $dbposts creates an array of posts and then to print each post we loop through it.
+          $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
+          $posts = '';
+      } else {
+          die('User not found!');
+      }
+  }
 
 ?>
-
 <!DOCTYPE html>
 <html>
 
@@ -111,123 +124,62 @@
     </nav>
   </div>
   <div class="container" style="display:block; text-align:center;">
-    <div class="col-md-7" style="display:inline-block; margin-top:50px; margin-right:9%;">
-      <textarea class="form-control description" name="description" id="description" placeholder="Wanna Share Something?" rows="3" autocomplete="off" required=""></textarea>
-      <div class="btn-div" style="text-align:right;">
-        <button type="submit" class="btn btn-success mt-2 px-3" id="withdraw"><i class="fas fa-image" id="wloader" aria-hidden="true"></i> Upload photo </button>
-        <button type="submit" class="btn btn-success mt-2 px-4" id="deposit" style="margin-left: 6px;"><i class="fa fa-plus-circle" id="dloader" aria-hidden="true"></i> Post </button>
-      </div>
-    </div>
+    <?php   if ($loggedInUserId == $userid) {
+      echo '<form class="col-md-7" style="display:inline-block; margin-top:50px; margin-right:9%;" action="profile.php?username='.$username.'" method="post">
+        <textarea class="form-control description" name="postbody" placeholder="Wanna Share Something?" rows="4"></textarea>
+        <div class="btn-div" style="text-align:right;">
+          <input type="submit" class="btn btn-success mt-2 px-3" name="post" value="Post"></input>
+          <!-- <button type="submit" class="btn btn-success mt-2 px-4" id="deposit" style="margin-left: 6px;"><i class="fa fa-plus-circle" id="dloader" aria-hidden="true"></i> Post </button> -->
+        </div>
+      </form>';
+    } ?>
+
+
+
     <div class="row">
       <div class="col-sm ">
         <!-- my right column for now it's empty -->
       </div>
       <div class="col-lg-7 post">
 
-        <div class="posting card">
-          <div class="header" style="display:flex;">
-            <div class="header-img" style="display:inline-block">
-              <img src="img/userimage.png" alt="userimg" height="40px" width="40px">
+        <?php    foreach ($dbposts as $p) {
+                  $posts = htmlspecialchars($p['body']);
+          echo '<div class="posting card">
+            <div class="header" style="display:flex;">
+              <div class="header-img" style="display:inline-block">
+                <img src="img/userimage.png" alt="userimg" height="40px" width="40px">
+              </div>
+              <div class="timestamp">
+                <a href="#" style="color:#3a9c3a; display:inline"><strong>'.$username.'</strong></a>
+                <span class="timestampContent" id="time">59 mins</span>
+              </div>
             </div>
-            <div class="timestamp">
-              <a href="#" style="color:#3a9c3a; display:inline"><strong>S.Najim_1177</strong></a>
-              <span class="timestampContent" id="time">59 mins</span>
-            </div>
-          </div>
-          <hr>
-          <div class="card-body">
-            <h6>Lorem Ipsum is simply dummy text of the recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</h6>
-            <img src="img\image-2.png" alt="" height="100%" width="100%">
             <hr>
-            <div class="row">
-              <div class="col-lg-4 like-sec">
-                <div class="likes" style="margin-left:10px;">
-                  <i class="far fa-heart">   0 Likes</i>
+            <div class="card-body">
+              <h6>'.$posts.'</h6>
+              <img src="img\image-2.png" alt="" height="100%" width="100%">
+              <hr>
+              <div class="row">
+                <div class="col-lg-4 like-sec">
+                  <div class="likes" style="margin-left:10px;">
+                    <i class="far fa-heart">   0 Likes</i>
+                  </div>
                 </div>
-              </div>
-              <div class="col-lg-4 dislike-sec">
-                <div class="dislike">
-                  <i class="far fa-thumbs-down">  0 Dislike</i>
+                <div class="col-lg-4 dislike-sec">
+                  <div class="dislike">
+                    <i class="far fa-thumbs-down">  0 Dislike</i>
+                  </div>
                 </div>
-              </div>
-              <div class="col-lg-4 report-sec">
-                <div class="report">
-                  <i class="fas fa-exclamation-circle"></i>  Report</i>
+                <div class="col-lg-4 report-sec">
+                  <div class="report">
+                    <i class="fas fa-exclamation-circle"></i>  Report</i>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </div>';
+           } ?>
 
-        <div class="posting card">
-          <div class="header" style="display:flex;">
-            <div class="header-img" style="display:inline-block">
-              <img src="img/userimage.png" alt="userimg" height="40px" width="40px">
-            </div>
-            <div class="timestamp">
-              <a href="#" style="color:#3a9c3a; display:inline"><strong>S.Najim_1177</strong></a>
-              <span class="timestampContent" id="time">59 mins</span>
-            </div>
-          </div>
-          <hr>
-          <div class="card-body">
-            <h6>Lorem Ipsum is simply dummy text of the recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</h6>
-            <img src="img\image-4.jpg" alt="" height="100%" width="100%">
-            <hr>
-            <div class="row">
-              <div class="col-lg-4 like-sec">
-                <div class="likes" style="margin-left:10px;">
-                  <i class="far fa-heart">   0 Likes</i>
-                </div>
-              </div>
-              <div class="col-lg-4 dislike-sec">
-                <div class="dislike">
-                  <i class="far fa-thumbs-down">  0 Dislike</i>
-                </div>
-              </div>
-              <div class="col-lg-4 report-sec">
-                <div class="report">
-                  <i class="fas fa-exclamation-circle"></i>  Report</i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="posting card">
-          <div class="header" style="display:flex;">
-            <div class="header-img" style="display:inline-block">
-              <img src="img/userimage.png" alt="userimg" height="40px" width="40px">
-            </div>
-            <div class="timestamp">
-              <a href="#" style="color:#3a9c3a; display:inline"><strong>S.Najim_1177</strong></a>
-              <span class="timestampContent" id="time">59 mins</span>
-            </div>
-          </div>
-          <hr>
-          <div class="card-body">
-            <h6>Lorem Ipsum is simply dummy text of the recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</h6>
-            <img src="img/image-5.jpg" alt="" height="100%" width="100%">
-            <hr>
-            <div class="row">
-              <div class="col-lg-4 like-sec">
-                <div class="likes" style="margin-left:10px;">
-                  <i class="far fa-heart">   0 Likes</i>
-                </div>
-              </div>
-              <div class="col-lg-4 dislike-sec">
-                <div class="dislike">
-                  <i class="far fa-thumbs-down">  0 Dislike</i>
-                </div>
-              </div>
-              <div class="col-lg-4 report-sec">
-                <div class="report">
-                  <i class="fas fa-exclamation-circle"></i>  Report</i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div class="posting card">
           <div class="header" style="display:flex;">
