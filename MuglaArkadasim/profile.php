@@ -2,10 +2,15 @@
 
   include('./classes/DB.php');
   include('./classes/Login.php');
+  include('./classes/Post.php');
+  include('./classes/TimeConv.php');
+
 
   $username = '';
   $isFollowing = false;
   $loggedInUserId = Login::isLoggedIn();
+  $postTime = '';
+  $now = time();
 
 
   // Check the link if the username is passed
@@ -20,7 +25,7 @@
                   if (!DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
                       DB::query('INSERT INTO followers VALUES (\'\', :userid, :followerid)', array(':userid'=>$userid, ':followerid'=>$followerid));
                   } else {
-                      echo 'Already following!';
+                    // echo "Already FOllowing!";
                   }
                   $isFollowing = true;
               }
@@ -39,21 +44,14 @@
           }
 
           if (isset($_POST['post'])) {
-              $postBody = $_POST['postbody'];
-
-              if (strlen($postBody) > 240 || strlen($postBody) < 1) {
-                  die("incorrect length!");
-              }
-
-              // if the logged in user is the one who is tryin to post then query
-
-                DB::query('INSERT INTO posts VALUES(\'\', :postbody, NOW(), :userid, 0)', array(':postbody'=>$postBody, ':userid'=>$userid));
+              Post::createPost( $_POST['postbody'], Login::isLoggedIn(), $userid);
+              header("Location: profile.php?username=$username");
 
           }
+          if (isset($_GET['postid'])) {
+              Post::likePost($_GET['postid'],$followerid);
+        }
 
-          // $dbposts creates an array of posts and then to print each post we loop through it.
-          $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
-          $posts = '';
       } else {
           die('User not found!');
       }
@@ -73,9 +71,8 @@
   <script src="https://kit.fontawesome.com/a81368914c.js"></script>
 </head>
 
-<body style="background-color:#e9ebee;">
+<body style="background-color:#e9ebee;" onload="form1.reset();">
 
-  <div class="navbar-div">
     <nav class="navbar navbar-expand-md navbar-dark bg-blue">
       <a class="navbar-brand logo" href="#">MuglaArkadasim</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -85,17 +82,16 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="userTimeline.html"><i class=" usercircle far fa-user-circle fa-lg"></i> <?php echo $username ?></a>
+            <a class="nav-link" href="profile.php?username=<?php echo $username; ?>"><i class=" usercircle far fa-user-circle fa-lg"></i> <?php echo $username ?></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index1.php">Home</a>
           </li>
           <li class="nav-item ">
             <a class="nav-link" href="joinClub.html">Clubs</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="joinChatrooms.html">Chatrooms</a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="homepage.php?pageSet=true">Logout</a>
           </li>
 
           <li class="nav-item">
@@ -111,22 +107,22 @@
               <div class="dropdown-divider"></div>
               <a href="createChatroom.html">Create chatroom</a>
               <div class="dropdown-divider"></div>
-              <a href="index.html">Logout</a>
+              <a href="logout.php?pageSet=true">Logout</a>
             </div>
           </li>
         </ul>
-
+        <div class="search-btn">
         <form class="form-inline">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-light my-sm-0" type="submit">Search</button>
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" >
+          <input type="submit" class="btn btn-light my-sm-0" name="post" value="Search"></input>
         </form>
       </div>
+      </div>
     </nav>
-  </div>
   <div class="container" style="display:block; text-align:center;">
     <?php   if ($loggedInUserId == $userid) {
       echo '<form class="col-md-7" style="display:inline-block; margin-top:50px; margin-right:9%;" action="profile.php?username='.$username.'" method="post">
-        <textarea class="form-control description" name="postbody" placeholder="Wanna Share Something?" rows="4"></textarea>
+        <textarea class="form-control description" name="postbody" placeholder="Wanna Share Something?" rows="4" required></textarea>
         <div class="btn-div" style="text-align:right;">
           <input type="submit" class="btn btn-success mt-2 px-3" name="post" value="Post"></input>
           <!-- <button type="submit" class="btn btn-success mt-2 px-4" id="deposit" style="margin-left: 6px;"><i class="fa fa-plus-circle" id="dloader" aria-hidden="true"></i> Post </button> -->
@@ -142,44 +138,7 @@
       </div>
       <div class="col-lg-7 post">
 
-        <?php    foreach ($dbposts as $p) {
-                  $posts = htmlspecialchars($p['body']);
-          echo '<div class="posting card">
-            <div class="header" style="display:flex;">
-              <div class="header-img" style="display:inline-block">
-                <img src="img/userimage.png" alt="userimg" height="40px" width="40px">
-              </div>
-              <div class="timestamp">
-                <a href="#" style="color:#3a9c3a; display:inline"><strong>'.$username.'</strong></a>
-                <span class="timestampContent" id="time">59 mins</span>
-              </div>
-            </div>
-            <hr>
-            <div class="card-body">
-              <h6>'.$posts.'</h6>
-              <img src="img\image-2.png" alt="" height="100%" width="100%">
-              <hr>
-              <div class="row">
-                <div class="col-lg-4 like-sec">
-                  <div class="likes" style="margin-left:10px;">
-                    <i class="far fa-heart">   0 Likes</i>
-                  </div>
-                </div>
-                <div class="col-lg-4 dislike-sec">
-                  <div class="dislike">
-                    <i class="far fa-thumbs-down">  0 Dislike</i>
-                  </div>
-                </div>
-                <div class="col-lg-4 report-sec">
-                  <div class="report">
-                    <i class="fas fa-exclamation-circle"></i>  Report</i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>';
-           } ?>
-
+        <?php $posts = Post::displayPosts($userid, $username, $followerid); ?>
 
         <div class="posting card">
           <div class="header" style="display:flex;">
@@ -294,8 +253,6 @@
             </div>
           </div>
 
-
-
         </div>
 
         <div class="card" style="margin-top:10px;" >
@@ -357,7 +314,6 @@
             </div>
           </div>
         </div>
-
 
       </div>
     </div>
