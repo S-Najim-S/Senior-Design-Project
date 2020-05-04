@@ -9,9 +9,11 @@
             die("incorrect length! from Create Post");
         }
 
+         $topics = self::getTopics($postBody);
+
         // if the logged in user is the one who is tryin to post then query
         if ($loggedInUserId == $profileUserId) {
-          DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\')', array(':postbody'=>$postBody, ':userid'=>$profileUserId));
+          DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\', :topics)', array(':postbody'=>$postBody, ':userid'=>$profileUserId, ':topics'=>$topics));
 
         } else {
           die( "Incorrect User!");
@@ -24,10 +26,11 @@
       if (strlen($postBody) > 240) {
           die("incorrect length! from Create Post");
       }
+       $topics = self::getTopics($postbody);
 
       // if the logged in user is the one who is tryin to post then query
       if ($loggedInUserId == $profileUserId) {
-        DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\')', array(':postbody'=>$postBody, ':userid'=>$profileUserId));
+        DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\', :topics)', array(':postbody'=>$postBody, ':userid'=>$profileUserId, ':topics'=> $topics));
         $postid = DB::query('SELECT id FROM posts WHERE user_id=:userid ORDER BY ID DESC LIMIT 1;', array(':userid'=>$loggedInUserId))[0]['id'];
                       return $postid;
       } else {
@@ -56,15 +59,52 @@
     }
     }
 
+    public static function getTopics($text) {
+
+                $text = explode(" ", $text);
+
+                $topics = "";
+
+                foreach ($text as $word) {
+                        if (substr($word, 0, 1) == "#") {
+                                $topics .= substr($word, 1).",";
+                        }
+                }
+
+                return $topics;
+        }
+
+    public static function link_add($text) {
+
+                $text = explode(" ", $text);
+                $newstring = "";
+
+                foreach ($text as $word) {
+                        if (substr($word, 0, 1) == "@") {
+                                $newstring .= "<a href='profile.php?username=".substr($word, 1)."'>".htmlspecialchars($word)."</a> ";
+                        } else if (substr($word, 0, 1) == "#") {
+                                $newstring .= "<a href='topics.php?topic=".substr($word, 1)."'>".htmlspecialchars($word)."</a> ";
+                        } else {
+                                $newstring .= htmlspecialchars($word)." ";
+                        }
+                }
+
+                return $newstring;
+        }
+
     public static function displayPosts($userid, $username, $loggedInUserId) {
 
       // $dbposts creates an array of posts and then to print each post we loop through it.
       $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
+      $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
+      // print_r($dbposts);
       $posts = '';
 
       foreach ($dbposts as $p) {
                     if (!DB::query('SELECT post_id FROM post_likes WHERE post_id=:postid AND user_id=:userid', array(':postid'=>$p['id'], ':userid'=>$loggedInUserId))) {
-                      $posts = htmlspecialchars($p['body']);
+
+                      $posts = self::link_add($p['body'])."<img style='margin-top:20px' height='100%' width='100%' src='".$p['postimg']."'>";
+
                       echo '<div class="posting card">
                         <div class="header" style="display:flex;">
                           <div class="header-img" style="display:inline-block">
@@ -78,7 +118,6 @@
                         <hr>
                         <div class="card-body">
                           <h6>'.$posts.'</h6>
-                          <img src="img\image-2.png" alt="" height="100%" width="100%">
                           <hr>
                           <div class="row">
 
@@ -114,7 +153,8 @@
                         </div>
                       </div>';
                     }else {
-                      $posts = htmlspecialchars($p['body']);
+
+                        $posts = self::link_add($p['body'])."<img style='margin-top:20px' height='100%' width='100%' src='".$p['postimg']."'>";
                       echo '<div class="posting card">
                         <div class="header" style="display:flex;">
                           <div class="header-img" style="display:inline-block">
@@ -128,7 +168,7 @@
                         <hr>
                         <div class="card-body">
                           <h6>'.$posts.'</h6>
-                          <img src="img\image-2.png" alt="" height="100%" width="100%">
+
                           <hr>
                           <div class="row">
 
@@ -172,7 +212,7 @@
       foreach ($followingposts as $p) {
                     // print_r($p);
                     if (!DB::query('SELECT post_id FROM post_likes WHERE post_id=:postid AND user_id=:userid', array(':postid'=>$p['id'], ':userid'=>$userid))) {
-                      $posts = htmlspecialchars($p['body']);
+                      $posts = self::link_add($p['body'])."<img style='margin-top:20px' height='100%' width='100%' src='".$p['postimg']."'>";
                       echo '<div class="posting card">
                         <div class="header" style="display:flex;">
                           <div class="header-img" style="display:inline-block">
@@ -186,7 +226,7 @@
                         <hr>
                         <div class="card-body">
                           <h6>'.$posts.'</h6>
-                          <img src="img\image-2.png" alt="" height="100%" width="100%">
+
                           <hr>
                           <div class="row">
 
@@ -222,7 +262,9 @@
                         </div>
                       </div>';
                     }else {
-                      $posts = htmlspecialchars($p['body']);
+
+                        $posts = self::link_add($p['body'])."<img style='margin-top:20px' height='100%' width='100%' src='".$p['postimg']."'>";
+
                       echo '<div class="posting card">
                         <div class="header" style="display:flex;">
                           <div class="header-img" style="display:inline-block">
@@ -236,7 +278,7 @@
                         <hr>
                         <div class="card-body">
                           <h6>'.$posts.'</h6>
-                          <img src="img\image-2.png" alt="" height="100%" width="100%">
+
                           <hr>
                           <div class="row">
 

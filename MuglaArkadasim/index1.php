@@ -25,7 +25,7 @@
 if (isset($_GET['postid']) && isset($_POST['dislike'])) {
     Post::dislikePost($_GET['postid'],$userid);
 }
-  $followingposts = DB::query('SELECT posts.id, posts.body,posts.posted_at, posts.likes, posts.dislikes, users.`username` FROM users, posts, followers
+  $followingposts = DB::query('SELECT posts.id, posts.body,posts.posted_at, posts.likes, posts.dislikes, posts.postimg, users.`username` FROM users, posts, followers
     WHERE posts.user_id = followers.user_id
     AND users.id = posts.user_id
     AND follower_id = '.$userid.'
