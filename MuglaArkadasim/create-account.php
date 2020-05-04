@@ -40,7 +40,7 @@
                           if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
                         // Insert Fields into the database and the password as hash value
-                              DB::query('INSERT INTO users VALUES(\'\', :username, :email, :password, :gender, :type)', array(':username'=>$username,':email'=>$email,':password'=>password_hash($password, PASSWORD_BCRYPT),':gender'=>$gender,':type'=>$type));
+                              DB::query('INSERT INTO users VALUES(\'\', :username, :email, :password, :gender, :type, \'\')', array(':username'=>$username,':email'=>$email,':password'=>password_hash($password, PASSWORD_BCRYPT),':gender'=>$gender,':type'=>$type));
                               $success = true;
                           } else {
                               $errors['email'] = "Invalid e-mail";

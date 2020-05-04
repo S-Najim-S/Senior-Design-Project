@@ -6,16 +6,34 @@
         // echo $postBody;
 
         if (strlen($postBody) > 240 || strlen($postBody) < 1) {
-            die("incorrect length!");
+            die("incorrect length! from Create Post");
         }
 
         // if the logged in user is the one who is tryin to post then query
         if ($loggedInUserId == $profileUserId) {
-          DB::query('INSERT INTO posts VALUES(\'\', :postbody, NOW(), :userid, 0, 0)', array(':postbody'=>$postBody, ':userid'=>$profileUserId));
+          DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\')', array(':postbody'=>$postBody, ':userid'=>$profileUserId));
+
         } else {
           die( "Incorrect User!");
         }
     }
+
+    public static  function createImgPost($postBody, $loggedInUserId, $profileUserId){
+      // echo $postBody;
+
+      if (strlen($postBody) > 240) {
+          die("incorrect length! from Create Post");
+      }
+
+      // if the logged in user is the one who is tryin to post then query
+      if ($loggedInUserId == $profileUserId) {
+        DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\')', array(':postbody'=>$postBody, ':userid'=>$profileUserId));
+        $postid = DB::query('SELECT id FROM posts WHERE user_id=:userid ORDER BY ID DESC LIMIT 1;', array(':userid'=>$loggedInUserId))[0]['id'];
+                      return $postid;
+      } else {
+        die( "Incorrect User!");
+      }
+  }
     public static function likePost($postId, $likerId){
       if (!DB::query('SELECT user_id FROM post_likes WHERE post_id=:postid AND user_id=:userid', array(':postid'=>$postId, ':userid'=>$likerId))) {
 
@@ -255,7 +273,7 @@
                       </div>';
                     }
                        }
-                       return $posts;
+                       // return $posts;
     }
 
     public static function showNavBar($username){
@@ -293,7 +311,7 @@
                      <div class="dropdown-divider"></div>
                      <a href="createChatroom.html">Create chatroom</a>
                      <div class="dropdown-divider"></div>
-                     <a href="logout.php">Logout</a>
+                     <a href="logout.php?pageSet=true">Logout</a>
                    </div>
                  </li>
                </ul>

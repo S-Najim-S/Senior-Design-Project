@@ -92,7 +92,7 @@ if (isset($_POST['login'])) {
         </div>
         <a href="forgotpassword.html">Forgot Password?</a>
         <input value="login" name="login" type="submit" class="btn btn-success mt-2 px-3"  id="login" style="display:block; margin-left: 40%;">
-        <p id="signup">Don't have an account? <a href="createUser.html">Sign up</a></p>
+        <p id="signup">Don't have an account? <a href="create-account.php">Sign up</a></p>
       </form>
     </div>
   </div>

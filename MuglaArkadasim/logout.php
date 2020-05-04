@@ -11,7 +11,8 @@
             // expires the cookies and the user gets logged out
             setcookie('SNID', '1', time()-3600);
             setcookie('SNID_', '1', time()-3600);
-            header('Location:loginPage.php');
+            echo "string";
+            header('Location:./loginPage.php');
 
         }
 

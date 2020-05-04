@@ -350,7 +350,7 @@ label {
   /* margin-top: 30px; */
   border: 0;
   display: inline-block;
-  background-color: #3a9c3a;
+  background-color: white;
 
 }
 .my-footer{
@@ -382,4 +382,7 @@ label {
   text-shadow: 1px 1px #3a9c3a;
   font-weight: 700;
   font-size: 10pt;
+}
+#file-upload-button{
+  background-color: red;
 }

@@ -4,6 +4,7 @@
   include('./classes/Login.php');
   include('./classes/Post.php');
   include('./classes/TimeConv.php');
+  include('./classes/Image.php');
 
 
   $username = '';
@@ -15,8 +16,6 @@
   $like = isset($_POST['like']);
   $loggedInUserName = DB::query('SELECT login_tokens.user_id, users.`username` FROM users,login_tokens
     WHERE users.id = login_tokens.user_id')[0]['username'];
-
-
 
 
   // Check the link if the username is passed
@@ -31,7 +30,7 @@
                   if (!DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
                       DB::query('INSERT INTO followers VALUES (\'\', :userid, :followerid)', array(':userid'=>$userid, ':followerid'=>$followerid));
                   } else {
-                    // echo "Already FOllowing!";
+                      // echo "Already FOllowing!";
                   }
                   $isFollowing = true;
               }
@@ -50,23 +49,28 @@
           }
 
           if (isset($_POST['post'])) {
-              Post::createPost( $_POST['postbody'], Login::isLoggedIn(), $userid);
-              header("Location: profile.php?username=$username");
+
+              if($_FILES['postimg']['size'] == 0){
+                  Post::createPost($_POST['postbody'], Login::isLoggedIn(), $userid);
+          }else {
+            $postid = Post::createImgPost($_POST['postbody'], Login::isLoggedIn(), $userid);
+            Image::uploadImage('postimg', "UPDATE posts SET postimg = :postimg WHERE id=:postid", array(':postid'=>$postid));
           }
 
+          }
+
+
           if (isset($_GET['postid']) && $dislik == 0) {
-              Post::likePost($_GET['postid'],$followerid);
-        }
+              Post::likePost($_GET['postid'], $followerid);
+          }
 
-        if (isset($_GET['postid']) && isset($_POST['dislike'])) {
-            Post::dislikePost($_GET['postid'],$followerid);
-      }
-
+          if (isset($_GET['postid']) && isset($_POST['dislike'])) {
+              Post::dislikePost($_GET['postid'], $followerid);
+          }
       } else {
           die('User not found!');
       }
   }
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -85,11 +89,11 @@
   <?php POST::showNavBar($loggedInUserName); ?>
   <div class="container" style="display:block; text-align:center;">
     <?php   if ($loggedInUserId == $userid) {
-      echo '<form class="col-md-7" style="display:inline-block; margin-top:50px; margin-right:9%;" action="profile.php?username='.$username.'" method="post">
-        <textarea class="form-control description" name="postbody" placeholder="Wanna Share Something?" rows="4" required></textarea>
+      echo '<form class="col-md-7" style="display:inline-block; margin-top:50px; margin-right:9%;" action="profile.php?username='.$username.'" method="post"  enctype="multipart/form-data">
+        <textarea class="form-control description" name="postbody" placeholder="Wanna Share Something?" rows="4" ></textarea>
         <div class="btn-div" style="text-align:right;">
+          <input type="file" class="btn btn-success mt-2 px-3" name="postimg"></input>
           <input type="submit" class="btn btn-success mt-2 px-3" name="post" value="Post"></input>
-          <!-- <button type="submit" class="btn btn-success mt-2 px-4" id="deposit" style="margin-left: 6px;"><i class="fa fa-plus-circle" id="dloader" aria-hidden="true"></i> Post </button> -->
         </div>
       </form>';
     } ?>
