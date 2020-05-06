@@ -315,6 +315,14 @@ label {
   font-size: 12px;
   color: #949faf;
 }
+.delete-btn{
+  /* max-height: 30px; */
+}
+.delete{
+  display: inherit;
+  margin-left: 30px;
+
+}
 .timestamp{
   /* border: solid 1px #000; */
   text-align: left;

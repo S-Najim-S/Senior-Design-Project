@@ -5,6 +5,7 @@
   include('./classes/Post.php');
   include('./classes/TimeConv.php');
   include('./classes/Image.php');
+  include('./classes/Search.php');
 
 
   $username = '';
@@ -16,6 +17,10 @@
   $like = isset($_POST['like']);
   $loggedInUserName = DB::query('SELECT login_tokens.user_id, users.`username` FROM users,login_tokens
     WHERE users.id = login_tokens.user_id')[0]['username'];
+
+    if (isset($_POST['searchbox'])) {
+      Search::searchBox($_POST['searchbox']);
+    }
 
 
   // Check the link if the username is passed
@@ -46,6 +51,14 @@
           if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
               //echo 'Already following!';
               $isFollowing = true;
+          }
+
+          if (isset($_POST['deletepost'])) {
+            if (DB::query('SELECT id FROM posts WHERE id=:postid AND user_id=:userid', array(':postid'=>$_GET['postid'], ':userid'=>$followerid))) {
+                              DB::query('DELETE FROM post_likes WHERE post_id=:postid', array(':postid'=>$_GET['postid']));
+                              DB::query('DELETE FROM posts WHERE id=:postid and user_id=:userid', array(':postid'=>$_GET['postid'], ':userid'=>$followerid));
+
+                      }
           }
 
           if (isset($_POST['post'])) {
@@ -86,7 +99,7 @@
 </head>
 
 <body style="background-color:#e9ebee;" onload="form1.reset();">
-  <?php POST::showNavBar($loggedInUserName); ?>
+  <?php POST::showNavBar($loggedInUserName, 'profile.php?username='.$username); ?>
   <div class="container" style="display:block; text-align:center;">
     <?php   if ($loggedInUserId == $userid) {
       echo '<form class="col-md-7" style="display:inline-block; margin-top:50px; margin-right:9%;" action="profile.php?username='.$username.'" method="post"  enctype="multipart/form-data">

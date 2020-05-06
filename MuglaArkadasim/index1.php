@@ -4,6 +4,7 @@
   include('./classes/Login.php');
   include('./classes/TimeConv.php');
   include('./classes/Post.php');
+  include('./classes/Search.php');
 
 
   $showTimeline = False;
@@ -18,6 +19,10 @@
     die("Not Logged in");
   }
 
+  if (isset($_POST['searchbox'])) {
+    Search::searchBox($_POST['searchbox']);
+  }
+
   if (isset($_GET['postid']) && $dislik == 0) {
       Post::likePost($_GET['postid'],$userid);
 }
@@ -25,6 +30,7 @@
 if (isset($_GET['postid']) && isset($_POST['dislike'])) {
     Post::dislikePost($_GET['postid'],$userid);
 }
+
   $followingposts = DB::query('SELECT posts.id, posts.body,posts.posted_at, posts.likes, posts.dislikes, posts.postimg, users.`username` FROM users, posts, followers
     WHERE posts.user_id = followers.user_id
     AND users.id = posts.user_id
@@ -33,6 +39,8 @@ if (isset($_GET['postid']) && isset($_POST['dislike'])) {
 
     $username = DB::query('SELECT users.`username` FROM users
     WHERE users.id = '.$userid.'')[0]['username'];
+
+
  ?>
 
  <!DOCTYPE html>
@@ -50,7 +58,7 @@ if (isset($_GET['postid']) && isset($_POST['dislike'])) {
 
  <body style="background-color:#e9ebee;" onload="form1.reset();">
 
-   <?php POST::showNavBar($username); ?>
+   <?php POST::showNavBar($username,'index1.php'); ?>
    <div class="container" style="display:block; text-align:center;">
 
      <div class="row">
