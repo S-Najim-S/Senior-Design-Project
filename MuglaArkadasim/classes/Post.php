@@ -14,6 +14,18 @@
 
           // if the logged in user is the one who is tryin to post then query
           if ($loggedInUserId == $profileUserId) {
+
+            if (count(self::notify($postBody)) != 0) {
+                               foreach (self::notify($postBody) as $key => $n) {
+                                               $s = $loggedInUserId;
+                                               $r = DB::query('SELECT id FROM users WHERE username=:username', array(':username'=>$key))[0]['id'];
+                                               if ($r != 0) {
+                                                       DB::query('INSERT INTO notifications VALUES (\'\', :type, :receiver, :sender, :extra)', array(':type'=>$n["type"], ':receiver'=>$r, ':sender'=>$s, ':extra'=>$n["extra"]));
+                                               }
+                                       }
+                               }
+
+
               DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\', :topics)', array(':postbody'=>$postBody, ':userid'=>$profileUserId, ':topics'=>$topics));
           } else {
               die("Incorrect User!");
@@ -31,6 +43,16 @@
 
           // if the logged in user is the one who is tryin to post then query
           if ($loggedInUserId == $profileUserId) {
+            if (count(self::createNotify($postBody)) != 0) {
+                               foreach (self::notify($postBody) as $key => $n) {
+                                               $s = $loggedInUserId;
+                                               $r = DB::query('SELECT id FROM users WHERE username=:username', array(':username'=>$key))[0]['id'];
+                                               if ($r != 0) {
+                                                       DB::query('INSERT INTO notifications VALUES (\'\', :type, :receiver, :sender, :extra)', array(':type'=>$n["type"], ':receiver'=>$r, ':sender'=>$s, ':extra'=>$n["extra"]));
+                                               }
+                                       }
+                               }
+
 
               DB::query('INSERT INTO posts VALUES (\'\', :postbody, NOW(), :userid, 0,0, \'\', :topics)', array(':postbody'=>$postBody, ':userid'=>$profileUserId, ':topics'=> $topics));
               $postid = DB::query('SELECT id FROM posts WHERE user_id=:userid ORDER BY ID DESC LIMIT 1;', array(':userid'=>$loggedInUserId))[0]['id'];
@@ -50,6 +72,8 @@
           } else if(!DB::query('SELECT user_id FROM post_likess WHERE post_id=:postid AND user_id=:userid', array(':postid'=>$postId, ':userid'=>$likerId)) && !DB::query('SELECT user_id FROM post_dislikes WHERE post_id=:postid AND user_id=:userid', array(':postid'=>$postId, ':userid'=>$likerId))){
               DB::query('UPDATE posts SET likes=likes+1 WHERE id=:postid', array(':postid'=>$postId));
               DB::query('INSERT INTO post_likess VALUES(\'\', :postid, :userid)', array(':postid'=>$postId, ':userid'=>$likerId));
+              self::notify("", $postId);
+
           }
           else {
             DB::query('UPDATE posts SET likes=likes-1 WHERE id=:postid', array(':postid'=>$postId));
@@ -89,26 +113,26 @@
           return $topics;
       }
 
-      public static function notify($text = "", $postid = 0)
-      {
-          $text = explode(" ", $text);
-          $notify = array();
+      public static function notify($text = "", $postid = 0) {
+               $text = explode(" ", $text);
+               $notify = array();
 
-          foreach ($text as $word) {
-              if (substr($word, 0, 1) == "@") {
-                  $notify[substr($word, 1)] = array("type"=>1, "extra"=>' { "postbody": "'.htmlentities(implode($text, " ")).'" } ');
-              }
-          }
+               foreach ($text as $word) {
+                       if (substr($word, 0, 1) == "@") {
+                               $notify[substr($word, 1)] = array("type"=>1, "extra"=>' { "postbody": "'.htmlentities(implode($text, " ")).'" } ');
+                       }
+               }
 
-          if (count($text) == 1 && $postid != 0) {
-              $temp = DB::query('SELECT posts.user_id AS receiver, post_likess.user_id AS sender FROM posts, post_likess WHERE posts.id = post_likess.post_id AND posts.id=:postid', array(':postid'=>$postid));
-              $r = $temp[0]["receiver"];
-              $s = $temp[0]["sender"];
-              DB::query('INSERT INTO notifications VALUES (\'\', :type, :receiver, :sender, :extra)', array(':type'=>2, ':receiver'=>$r, ':sender'=>$s, ':extra'=>""));
-          }
+               if (count($text) == 1 && $postid != 0) {
+                       $temp = DB::query('SELECT posts.user_id AS receiver, post_likess.user_id AS sender FROM posts, post_likess WHERE posts.id = post_likess.post_id AND posts.id=:postid', array(':postid'=>$postid));
+                       $r = $temp[0]["receiver"];
+                       $s = $temp[0]["sender"];
+                       DB::query('INSERT INTO notifications VALUES (\'\', :type, :receiver, :sender, :extra)', array(':type'=>2, ':receiver'=>$r, ':sender'=>$s, ':extra'=>""));
+               }
 
-          return $notify;
-      }
+               return $notify;
+       }
+
       public static function link_add($text)
       {
           $text = explode(" ", $text);
@@ -415,9 +439,9 @@
                       </div>
                     </li>
                   </ul>
-                  <form class="form-inline ml-auto col-sm-4" style="float:right">
-                    <input type="text" class="form-control mr-sm-2" placeholder="Search">
-                    <button type="submit" class="btn btn-outline-light">Search</button>
+                  <form class="form-inline ml-auto col-sm-4" style="float:right" form action="index1.php" method="post">
+                    <input type="text" class="form-control mr-sm-2" placeholder="Search" name="searchbox">
+                    <button type="submit" name="search" class="btn btn-outline-light">Search</button>
                   </form>
                 </div>
 

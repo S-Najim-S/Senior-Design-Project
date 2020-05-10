@@ -5,8 +5,11 @@
   include('./classes/Post.php');
   include('./classes/TimeConv.php');
   include('./classes/Image.php');
-  include('./classes/Search.php');
 
+  if (Login::isLoggedIn()) {
+  } else {
+    die("Not Logged in");
+  }
 
   $username = '';
   $isFollowing = false;
