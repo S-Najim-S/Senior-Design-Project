@@ -68,7 +68,8 @@ body {
 hr {
   box-sizing: content-box;
   height: 0;
-  overflow: visible
+  overflow: visible;
+  margin-bottom:0px !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -2707,8 +2708,8 @@ a.btn.disabled, fieldset:disabled a.btn {
 
 .btn-success {
   color: #fff;
-  background-color: #28a745;
-  border-color: #28a745
+  background-color: #3d483f;
+  border-color: #3d483f
 }
 
 .btn-success:hover {
@@ -4315,8 +4316,6 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
   padding-top: .3125rem;
   padding-bottom: .3125rem;
   margin-right: 1rem;
-  margin-left: 3rem;
-
   font-size: 1.25rem;
   line-height: inherit;
   white-space: nowrap
@@ -6742,9 +6741,6 @@ a.bg-light:focus, a.bg-light:hover, button.bg-light:focus, button.bg-light:hover
 
 .bg-dark {
   background-color: #343a40 !important
-}
-.bg-blue{
-  background-color: #3f3d56 !important
 }
 
 a.bg-dark:focus, a.bg-dark:hover, button.bg-dark:focus, button.bg-dark:hover {
@@ -10387,5 +10383,3 @@ a.text-dark:focus, a.text-dark:hover {
     border-color: #dee2e6
   }
 }
-
-/*# sourceMappingURL=bootstrap.min.css.map */

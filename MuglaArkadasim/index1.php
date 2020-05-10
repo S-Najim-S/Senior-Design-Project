@@ -47,6 +47,7 @@ if (isset($_GET['postid']) && isset($_POST['dislike'])) {
  <html>
 
  <head>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
    <title>MuglaArkadasim</title>
    <link rel="stylesheet" href="css\bootstrap.min.css">
    <link rel="stylesheet" href="css\style.css">
@@ -56,183 +57,54 @@ if (isset($_GET['postid']) && isset($_POST['dislike'])) {
    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
  </head>
 
- <body style="background-color:#e9ebee;" onload="form1.reset();">
+ <body style="background-color:#e9ebee;">
+
 
    <?php POST::showNavBar($username,'index1.php'); ?>
-   <div class="container" style="display:block; text-align:center;">
-
-     <div class="row">
-       <div class="col-sm ">
-         <!-- my right column for now it's empty -->
-       </div>
-       <div class="col-lg-7 post">
-
+   <section class="hero">
+     <div class="container">
+       <div class="row">
+         <div class="col-lg-6 offset-lg-3">
          <?php    Post::displayFollowerPosts($followingposts, $userid) ?>
 
+          </div>
+
+          <div class="col-lg-3">
+
+            <!-- Clubs Section -->
+            <div class="shadow-lg p-4 mb-2 bg-white author">
+              <a href="http://www.themashabrand.com/">Get more from themashabrand.com</a>
+              <p>Bootstrap 4.1.0</p>
+            </div>
+
+            <!-- Chatrooms Section -->
+              <div class="shadow-lg p-4 mb-2 bg-white author">
+                <a href="http://www.themashabrand.com/">Get more from themashabrand.com</a>
+                <p>Bootstrap 4.1.0</p>
+              </div>
+            <!--/ col-lg-3 -->
+          </div>
+          <!--/ col-lg-3 -->
 
 
-         <div class="posting card">
-           <div class="header" style="display:flex;">
-             <div class="header-img" style="display:inline-block">
-               <img src="img/userimage.png" alt="userimg" height="40px" width="40px">
-             </div>
-             <div class="timestamp">
-               <a href="#" style="color:#3a9c3a; display:inline"><strong>S.Najim_1177</strong></a>
-               <span class="timestampContent" id="time">59 mins</span>
-             </div>
-           </div>
-           <hr>
-           <div class="card-body">
-             <h6>Lorem Ipsum is simply dummy text of the recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</h6>
-             <img src="img/postPhoto.jpg" alt="" height="100%" width="100%">
-             <hr>
-             <div class="row">
-               <div class="col-lg-4 like-sec">
-                 <div class="likes" style="margin-left:10px;">
-                   <i class="far fa-heart">   0 Likes</i>
-                 </div>
-               </div>
-               <div class="col-lg-4 dislike-sec">
-                 <div class="dislike">
-                   <i class="far fa-thumbs-down">  0 Dislike</i>
-                 </div>
-               </div>
-               <div class="col-lg-4 report-sec">
-                 <div class="report">
-                   <i class="fas fa-exclamation-circle"></i>  Report</i>
-                 </div>
-               </div>
-             </div>
-           </div>
-         </div>
 
-       </div>
-       <div class="col-sm-3 right-box">
+        </div>
+        <!--/ row -->
+      </div>
+      <!--/ container -->
+    </section>
 
-         <div class="card" >
-           <div class="chat-groups">
-             <h6 style="margin-top:10px; color:#3a9c3a;">My Chatrooms</h6>
-             <hr>
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\chatroom-photo.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
 
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\image-2.png" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>HelloWorld</strong></a>
-               </div>
-             </div>
 
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\image-4.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap.min.js"></script>
 
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\image-5.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
-
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\postPhoto.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
-
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\userimage.png" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
-           </div>
-
-         </div>
-
-         <div class="card" style="margin-top:10px;" >
-           <div class="clubs">
-             <h6 style="margin-top:10px; color:#3a9c3a;">My Clubs</h6>
-             <hr>
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\userimage.png" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>Bilgisayar Bilesim</strong></a>
-               </div>
-             </div>
-
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\postPhoto.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>Economist</strong></a>
-               </div>
-             </div>
-
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\image-5.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>Fen ve Edebyat</strong></a>
-               </div>
-             </div>
-
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\chatroom-photo.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
-
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\image-4.jpg" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
-
-             <div class="header" style="display:flex;">
-               <div class="header-img" style="display:inline-block">
-                 <img src="img\image-2.png" alt="userimg" height="40px" width="40px">
-               </div>
-               <div class="chatroom-name">
-                 <a href="#" style="margin-top:15px;"><strong>CENG1920</strong></a>
-               </div>
-             </div>
-           </div>
-         </div>
-
-       </div>
-     </div>
-   </div>
+    <script type="text/javascript">
+      $('#selectedFile').change(function() {
+        var a = $('#selectedFile').val().toString().split('\\');
+        $('#fakeInput').val(a[a.length - 1]);
+      });
+    </script>
  </body>
 
  </html>

@@ -11,11 +11,16 @@ if (isset($_GET['token'])) {
             $newpassword = $_POST['newpassword'];
             $newpasswordrepeat = $_POST['newpasswordrepeat'];
 
+            echo $newpassword;
+            echo $newpasswordrepeat;
+
             if ($newpassword == $newpasswordrepeat) {
                 if (strlen($newpassword) >= 6 && strlen($newpassword) <= 60) {
                     DB::query('UPDATE users SET password=:newpassword WHERE id=:userid', array(':newpassword'=>password_hash($newpassword, PASSWORD_BCRYPT), ':userid'=>$userid));
                     echo 'Password changed successfully!';
                     DB::query('DELETE FROM password_token WHERE user_id=:userid', array(':userid'=>$userid));
+
+                    header('Location:loginPage.php');
                 }
             } else {
                 echo 'Passwords don\'t match!';
@@ -49,7 +54,7 @@ if (isset($_GET['token'])) {
       <img src="img/newPassword.svg">
     </div>
     <div class="login-content">
-      <form action="forgotPassword.php" method="post">
+      <form action="forgotPassword.php?token=<?php echo $token; ?>" method="post">
         <!-- <img src="img/avatar.svg"> -->
           <div class="textpart">
           <h4>Welcome to</h4>
@@ -71,7 +76,7 @@ if (isset($_GET['token'])) {
           <i class="fas fa-lock"></i>
         </div>
         <div class="div">
-          <input type="password" class="input" name="password" placeholder="New Password" required>
+          <input type="password" class="input" name="newpassword" placeholder="New Password" required>
         </div>
       </div>
 

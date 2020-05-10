@@ -1,6 +1,7 @@
 
 <?php
-  include('./classes/DB.php');
+include('./classes/DB.php');
+  include('./classes/Mail.php');
   $success = false;
   $error = false;
 
@@ -12,9 +13,8 @@
         $token = bin2hex(openssl_random_pseudo_bytes(64, $cstrong));
         $user_id = DB::query('SELECT id FROM users WHERE email=:email', array(':email'=>$email))[0]['id'];
         DB::query('INSERT INTO password_token VALUES (\'\', :token, :user_id)', array(':token'=>sha1($token), ':user_id'=>$user_id));
+        Mail::sendMail('Forgot Password!', "<a href='http://localhost/MuglaArkadasim3/forgotPassword.php?token=$token'>http://localhost/MuglaArkadasim3/forgotPassword.php?token=$token</a>", $email);
         $success = true;
-
-        echo $token;
   }else {
     $error = true;
   }
@@ -48,7 +48,7 @@
 
         <?php if ($success): ?>
         <div class="alert alert-success">
-          <li><?php echo "We Sent this ".$token. "to this ". $email. ", Please login to your email to reset password"; ?></li>
+          <li><?php echo "We Sent a reset link to this ". $email. ", Please login to your email to reset password"; ?></li>
           <?php $email = ''; ?>
       </div>
       <?php endif;?>
@@ -70,7 +70,7 @@
         </div>
 
         <input type="submit" class="btn btn-success mt-2 px-3" name="resetpassword"style="display:block; margin-left: 24%; margin-bottom:10px;" value="Request Reset Link">
-        <p id="signup"><a href="index.html">back to login</a></p>
+        <p id="signup"><a href="loginPage.php">back to login</a></p>
       </form>
     </div>
   </div>

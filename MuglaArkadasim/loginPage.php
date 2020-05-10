@@ -11,8 +11,8 @@ if (isset($_POST['login'])) {
         if (DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$username))) {
 
                 if (password_verify($password, DB::query('SELECT password FROM users WHERE username=:username', array(':username'=>$username))[0]['password'])) {
-                        echo 'Logged in!';
-
+                      $verified = DB::query('SELECT verified FROM users WHERE username=:username',array(':username'=>$username))[0]['verified'];
+                      if($verified ==1){
                         // Generate Token using openssl_random_pseudo_bytes function
                         $cstrong = True;
                         $token = bin2hex(openssl_random_pseudo_bytes(64, $cstrong));
@@ -25,6 +25,10 @@ if (isset($_POST['login'])) {
                         setcookie("SNID_", '1', time() +60 * 60 * 24 * 3, '/', NULL, NULL, True);
 
                         header('Location:index1.php');
+                      }else {
+                        $errors['email']= "Please verify your email";
+                      }
+
                 } else {
                         $errors['password'] = 'Incorrect password';
 
@@ -37,66 +41,52 @@ if (isset($_POST['login'])) {
 }
  ?>
 
-<!DOCTYPE html>
-<html>
+ <!DOCTYPE html>
+ <html>
 
-<head>
-      <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/album/">
-      <link rel="stylesheet" href="css\bootstrap.min.css">
-  <title>MuglaArkadasim</title>
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a81368914c.js"></script>
-</head>
+ <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+     <title>MuglaArkadasim</title>
+     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+     <link rel="stylesheet" href="assets/fonts/ionicons.min.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+     <link rel="stylesheet" href="assets/css/Login-Form-Dark.css">
+     <link rel="stylesheet" href="assets/css/styles.css">
+     <link rel="stylesheet" href="./css/style.css">
+ </head>
+
 
 <body>
-  <img class="wave" src="img/wave.png">
-  <div class="container">
-    <div class="img">
-      <img src="img/background.svg">
-    </div>
-    <div class="login-content">
-      <form action="loginPage.php" method="post">
-        <!-- <img src="img/avatar.svg"> -->
-          <div class="textpart">
-          <h4>Welcome to</h4>
-          <h3>MuglaArkadasim</h3>
-          <h4 id="leftp">Log in to get updates about the events around you</h4>
+
+      <div class="login-dark">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="text-center" style="color: #a2c9fd;padding-top:80px;">Mugla Arkadasim</h1>
+            <h4 style="color: #a2c9fd; text-align:center;">Log in to get updates about the events around you</h4>
+
+
+            <!-- popup error message if there is any error in the array -->
+            <?php if (count($errors) >0): ?>
+            <?php foreach ($errors as $error): ?>
+              <h5 style="color: red; text-align:center;"><?php echo $error; ?></h5>
+            <?php endforeach; ?>
+            <?php endif; ?>
+            <div class="embed-responsive embed-responsive-16by9"><iframe class="embed-responsive-item"></iframe></div>
         </div>
 
-        <!-- popup error message if there is any error in the array -->
-        <?php if (count($errors) >0): ?>
-        <div class="alert alert-danger">
-        <?php foreach ($errors as $error): ?>
-          <li><?php echo $error; ?></li>
-        <?php endforeach; ?>
+          <form action="loginPage.php" method="post">
+              <h2 class="sr-only">Login Form</h2>
+              <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
+              <div class="form-group"><i class="fas fa-user"></i><input class="form-control" type="text" value="<?php echo $username; ?>" name="username" placeholder="Username" required></div>
+              <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password" required></div>
+              <a href="emailtoken.php">Forgot Password?</a>
+              <div class="form-group"><input class="btn btn-primary btn-block" name="login" type="submit" value="Login"></button></div>
+              <p id="signup">Don't have an account? <a href="create-account.php">Sign up</a></p>
+            </form>
       </div>
-      <?php endif; ?>
-
-
-          <div class="input-div one">
-          <div class="i">
-            <i class="fas fa-user"></i>
-          </div>
-          <div class="div">
-            <input type="text" name="username" value="<?php echo $username; ?>"class="input" placeholder="Username" required>
-          </div>
-        </div>
-        <div class="input-div pass">
-          <div class="i">
-            <i class="fas fa-lock"></i>
-          </div>
-          <div class="div">
-            <input type="password" class="input" name="password" placeholder="Password" required>
-          </div>
-        </div>
-        <a href="forgotpassword.html">Forgot Password?</a>
-        <input value="login" name="login" type="submit" class="btn btn-success mt-2 px-3"  id="login" style="display:block; margin-left: 40%;">
-        <p id="signup">Don't have an account? <a href="create-account.php">Sign up</a></p>
-      </form>
-    </div>
-  </div>
-  <script type="text/javascript" src="js/main.js"></script>
+      <script src="assets/js/jquery.min.js"></script>
+      <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+      <script src="assets/js/bs-init.js"></script>
 </body>
 
 </html>
