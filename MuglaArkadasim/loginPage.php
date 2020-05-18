@@ -79,7 +79,7 @@ if (isset($_POST['login'])) {
               <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
               <div class="form-group"><i class="fas fa-user"></i><input class="form-control" type="text" value="<?php echo $username; ?>" name="username" placeholder="Username" required></div>
               <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password" required></div>
-              <a href="emailtoken.php">Forgot Password?</a>
+              <a href="email_token.php">Forgot Password?</a>
               <div class="form-group"><input class="btn btn-primary btn-block" name="login" type="submit" value="Login"></button></div>
               <p id="signup">Don't have an account? <a href="create-account.php">Sign up</a></p>
             </form>

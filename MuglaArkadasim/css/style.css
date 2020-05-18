@@ -267,3 +267,9 @@ hr{
   /* margin-left: 25px !important; */
   background-color: inherit;
 }
+.dropdown-menu{
+  text-align: center;
+}
+.nav-cl{
+  color: #555 !important;
+}

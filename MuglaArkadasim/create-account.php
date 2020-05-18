@@ -21,19 +21,14 @@
 
       $cstrong = True;
       $token = bin2hex(openssl_random_pseudo_bytes(64, $cstrong));
-      echo $token;
 
 
       if ($type === 'staff') {
           $email = $username.'@mu.edu.tr';
-          if (!DB::query('SELECT email FROM users WHERE email=:email', array(':email'=>$email)) && !DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$username))) {
-              Mail::sendMail('Welcome to Mugla Arkadasim', 'Your account has been created', $email);
-          }
+
       } else if($type === 'student'){
         $email = $username.'@posta.mu.edu.tr';
-        if (!DB::query('SELECT email FROM users WHERE email=:email', array(':email'=>$email)) && !DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$username))) {
-            Mail::sendMail('Verification','<a href="http://localhost/MuglaArkadasim3/verify.php?token='.$token.'">Register Account</a>', $email);
-      }
+
     }else {
       $errors['email'] = "Can't send Email";
     }
@@ -58,7 +53,18 @@
                               if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
                         // Insert Fields into the database and the password as hash value
-                                  DB::query('INSERT INTO users VALUES(\'\', :username, :email, :password, :gender, :type, \'\',0, :token)', array(':username'=>$username,':email'=>$email,':password'=>password_hash($password, PASSWORD_BCRYPT),':gender'=>$gender,':type'=>$type, ':token'=>sha1($token)));
+                        if ($type === 'staff') {
+
+                            if (!DB::query('SELECT email FROM users WHERE email=:email', array(':email'=>$email)) && !DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$username))) {
+                                Mail::sendMail('Verification','Welcome to Mugla Arkadasim', 'Your account has been created', $email);
+                            }
+                        } else if($type === 'student'){
+
+                          if (!DB::query('SELECT email FROM users WHERE email=:email', array(':email'=>$email)) && !DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$username))) {
+                              Mail::sendMail('Verification','<a href="http://localhost/MuglaArkadasim4/verify.php?token='.$token.'">Register Account</a>', $email);
+                        }
+                      }
+                                  DB::query('INSERT INTO users VALUES(\'\', :username, :email, :password, :gender, :type, \'\',0, :token, NOW())', array(':username'=>$username,':email'=>$email,':password'=>password_hash($password, PASSWORD_BCRYPT),':gender'=>$gender,':type'=>$type, ':token'=>sha1($token)));
                                   $success = true;
                               } else {
                                   $errors['email'] = "Invalid e-mail";
@@ -150,11 +156,11 @@
       </div>
 
       <div class="form-check form-check-inline" style="margin:10px 10px;">
-        <input class="form-check-input" name="gender" value="male" type="radio" id="formCheck-3">
+        <input class="form-check-input" name="gender" value="male" type="radio" id="formCheck-3" required>
         <label class="form-check-label" for="formCheck-3">Male</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" name="gender" value="female" type="radio" id="formCheck-4">
+        <input class="form-check-input" name="gender" value="female" type="radio" id="formCheck-4" required>
         <label class="form-check-label" for="formCheck-4">Female</label>
       </div>
       <div class="form-group">

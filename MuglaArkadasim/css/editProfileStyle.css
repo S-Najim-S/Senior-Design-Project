@@ -54,8 +54,10 @@ body{
   overflow: hidden;
 }
 .author-card .author-card-profile .author-card-avatar > img {
-  display: block;
-  width: 100%;
+    display: block;
+    max-width: 220px;
+    max-height: 90px;
+    width: 100%;
 }
 .author-card .author-card-profile .author-card-details {
   padding-top: 20px;

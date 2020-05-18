@@ -2,16 +2,24 @@
 
   include('./classes/DB.php');
   include('./classes/Login.php');
+  include('./classes/Post.php');
+  include('./classes/Image.php');
   $success = false;
   $errors = array();
-
+  $userid = Login::isLoggedIn();
+  $loggedInUserName = DB::query('SELECT login_tokens.user_id, users.`username` FROM users,login_tokens
+    WHERE users.id = login_tokens.user_id')[0]['username'];
+    $profileimg = DB::query('SELECT profileimg FROM `users` WHERE username=:username',array(':username'=>$loggedInUserName))[0]['profileimg'];
+    $email = DB::query('SELECT email FROM `users` WHERE username=:username',array(':username'=>$loggedInUserName))[0]['email'];
+    $created_at = DB::query('SELECT users.created_at FROM users
+      WHERE username=:username', array(':username'=>$loggedInUserName))[0]['created_at'];
   // Using Login:: to refrence the function
   if (Login::isLoggedIn()) {
       if (isset($_POST['changepassword'])) {
           $oldPassword = $_POST['oldpassword'];
           $newPassword = $_POST['newpassword'];
           $confirmPassword = $_POST['confirmpassword'];
-          $userid = Login::isLoggedIn();
+
           if (password_verify($oldPassword, DB::query('SELECT password FROM users WHERE id=:userid', array(':userid'=>$userid))[0]['password'])) {
               if ($newPassword == $confirmPassword) {
                   echo $newPassword;
@@ -29,9 +37,33 @@
             $errors['password'] = 'Incorrect old password';
           }
       }
-  } else {
+
+      if (isset($_POST['updateProfile'])) {
+          $conPassword = $_POST['conpassword'];
+          $newUsername = $_POST['newUsername'];
+          if (password_verify($conPassword, DB::query('SELECT password FROM users WHERE id=:userid', array(':userid'=>$userid))[0]['password'])) {
+                  if (strlen($newUsername) >=3 && strlen($newUsername)<=32) {
+                  // Check if username is consist of valid charachters
+                      if (preg_match('/^[a-zA-Z0-9_]*$/', $newUsername)) {
+                      DB::query('UPDATE users SET username=:newUsername WHERE id=:userid', array(':newUsername'=>$newUsername, ':userid'=>$userid));
+                      // $success = true;
+                  } else {
+                      $errors['username'] = 'username length must be more than 7 characters';
+                  }
+              }else{
+                $errors['username'] = 'Invalid username charachters';
+      }
+    }
+  }
+  if(isset($_POST['uploadImage'])){
+    Image::uploadImage('profileimg',"UPDATE users SET profileimg = :profileimg WHERE id=:userid", array(':userid'=>Login::isLoggedIn()));
+  }
+} else {
       die( "Not Logged in ");
   }
+
+
+
 
  ?>
 
@@ -53,53 +85,8 @@
 
 <body>
 
-  <div class="navbar-div">
-    <nav class="navbar navbar-expand-md navbar-dark bg-blue">
-      <a class="navbar-brand logo" href="#">MuglaArkadasim</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <?php Post::showNavBar($loggedInUserName, 'profile.php?username='.$loggedInUserName); ?>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mx-auto">
-          <li class="nav-item ">
-            <a class="nav-link" href="userTimeline.html"><i class=" usercircle far fa-user-circle fa-lg"></i> User_name</a>
-          </li>
-          <li class="nav-item ">
-            <a class="nav-link" href="joinClub.html">Clubs</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="joinChatrooms.html">Chatrooms</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="homepage.html">Logout</a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link fas fa-bell fa-sx" style="
-    margin-top:4px;" href="#"></a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link fas fa-caret-down fa-lg" id="navbarDropdown" role="button" data-toggle="dropdown" style="margin-top:4px;" href="#"></a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a href="editProfile.html">Edit profile</a>
-              <div class="dropdown-divider"></div>
-              <a href="createClub.html">Create club</a>
-              <div class="dropdown-divider"></div>
-              <a href="createChatroom.html">Create chatroom</a>
-              <div class="dropdown-divider"></div>
-              <a href="index.html">Logout</a>
-            </div>
-          </li>
-        </ul>
-
-        <form class="form-inline">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-light my-sm-0" type="submit">Search</button>
-        </form>
-      </div>
-    </nav>
-  </div>
   <div class="container mt-5">
     <div class="row">
       <div class="col-lg-4 pb-5">
@@ -107,54 +94,52 @@
         <div class="author-card pb-3">
           <div class="author-card-cover" style="background-image: url(https://demo.createx.studio/createx-html/img/widgets/author/cover.jpg);"></div>
           <div class="author-card-profile">
-            <div class="author-card-avatar"><img src="img\userimage.png" alt="User_Image">
+            <?php if($profileimg == null){
+            echo'<div class="author-card-avatar"><img src="./img/profileplaceholder.png" max-height="50px" max-width="220px" alt="User_Image">';
+            }else {
+              echo'<div class="author-card-avatar"><img src="'.$profileimg.'" alt="User_Image">';
+
+            }?>
             </div>
             <div class="author-card-details">
-              <h5 class="author-card-name text-lg">S.Najim_1177</h5><span class="author-card-position">Joined March 06, 2017</span>
+              <h5 class="author-card-name text-lg"><?php echo $loggedInUserName; ?></h5><span class="author-card-position"><?php echo $created_at;?></span>
             </div>
           </div>
+          <form class="col-md-2" style="display:inline-block; margin-top:50px; margin-right:9%;" action="editProfile.php" method="post"  enctype="multipart/form-data">
+             <!-- <img src="img/avatar.svg"> -->
+             <input type="file" class="btn btn-success mt-2 px-3" name="profileimg" ></input>
+             <input value="Upload photo" type="submit" class="btn btn-success mt-2 px-3" name="uploadImage" style="display:block; margin-left: 25%;">
+           </form>
         </div>
       </div>
       <!-- Profile Settings-->
       <div class="col-lg-8 pb-5">
-        <form class="row">
+        <form class="row" action="editProfile.php" method="post">
 
           <div class="col-md-6">
             <div class="form-group">
               <label for="account-fn">Username</label>
-              <input class="form-control" type="text" id="account-un" value="S.Najim_1177" required="">
+              <input class="form-control" type="text" name="newUsername" id="account-un" value="<?php echo $loggedInUserName; ?>" required="">
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="account-fn">Date Of Birth</label>
-              <input class="form-control" type="date" id="account-bd" value="S.Najim_1177" required="">
-            </div>
-          </div>
+
           <div class="col-md-6">
             <div class="form-group">
               <label for="account-email">E-mail Address</label>
-              <input class="form-control" type="email" id="account-email" value="S_najimullahs@posta.mu.edu.tr" disabled="">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="account-phone">Phone Number</label>
-              <input class="form-control" type="number" id="account-phone" value="+">
+              <input class="form-control" type="email" id="account-email" value="<?php echo $email; ?>" disabled="">
             </div>
           </div>
 
           <div class="col-md-6">
             <div class="form-group">
               <label for="account-confirm-pass">Confirm Password</label>
-              <input class="form-control" type="password" id="account-confirm-pass">
+              <input class="form-control" type="password" name="conpassword" id="account-confirm-pass">
             </div>
           </div>
           <div class="col-12">
             <hr class="mt-2 mb-3">
             <div class="d-flex flex-wrap justify-content-between align-items-center">
-              <button class="btn btn-style-1 btn-success" type="button" data-toast="" data-toast-position="topRight" data-toast-type="success" data-toast-icon="fe-icon-check-circle" data-toast-title="Success!"
-                data-toast-message="Your profile updated successfuly.">Update Profile</button>
+              <input class="btn btn-style-1 btn-success" type="submit" name="updateProfile" value="Update username"></input>
             </div>
           </div>
         </form>

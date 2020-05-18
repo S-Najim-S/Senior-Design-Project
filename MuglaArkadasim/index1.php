@@ -49,12 +49,12 @@ if (isset($_POST['searchbox'])) {
               }
       }
       $posts = DB::query('SELECT posts.body FROM posts WHERE posts.body LIKE :body '.$whereclause.'', $paramsarray);
-      echo '<pre>';
-      print_r($posts);
-      echo '</pre>';
+      // echo '<pre>';
+      // print_r($posts);
+      // echo '</pre>';
 }
 
-  $followingposts = DB::query('SELECT posts.id, posts.body,posts.posted_at, posts.likes, posts.dislikes, posts.postimg, users.`username` FROM users, posts, followers
+  $followingposts = DB::query('SELECT posts.id, posts.body,posts.posted_at, posts.likes, posts.dislikes, posts.postimg,posts.user_id, users.`username` FROM users, posts, followers
     WHERE posts.user_id = followers.user_id
     AND users.id = posts.user_id
     AND follower_id = '.$userid.'
@@ -70,9 +70,9 @@ if (isset($_POST['searchbox'])) {
  <html>
 
  <head>
-   <meta name="viewport" content="width=device-width, initial-scale=1">
    <title>MuglaArkadasim</title>
-   <link rel="stylesheet" href="css\bootstrap.min.css">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
    <link rel="stylesheet" href="css\style.css">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
@@ -81,7 +81,6 @@ if (isset($_POST['searchbox'])) {
  </head>
 
  <body style="background-color:#e9ebee;">
-
 
    <?php POST::showNavBar($username,'index1.php'); ?>
    <section class="hero">
@@ -117,8 +116,6 @@ if (isset($_POST['searchbox'])) {
       <!--/ container -->
     </section>
 
-
-
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
 
@@ -128,6 +125,40 @@ if (isset($_POST['searchbox'])) {
         $('#fakeInput').val(a[a.length - 1]);
       });
     </script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+                $('.sbox').keyup(function() {
+                        $('.autocomplete').html("")
+                        $.ajax({
+
+                                type: "GET",
+                                url: "api/search?query=" + $(this).val(),
+                                processData: false,
+                                contentType: "application/json",
+                                data: '',
+                                success: function(r) {
+                                  // alert(r)
+                                  r = JSON.parse(r)
+                                 for (var i = 0; i < r.length; i++) {
+                                         console.log(r[i].body)
+                                         $('.autocomplete').html(
+                                                        $('.autocomplete').html() +
+                                                        '<li class="list-group-item"><span>'+r[i].body+'</span></li>'
+                                                )
+                                       }
+                                },
+                                error: function(r){
+                                  console.log(r);
+                                }
+                              })
+                            })
+                          })
+
+                          </script>
+
+
  </body>
 
  </html>

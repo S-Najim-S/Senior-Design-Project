@@ -2,6 +2,8 @@
 
   class Post
   {
+
+
       public static function createPost($postBody, $loggedInUserId, $profileUserId)
       {
           // echo $postBody;
@@ -43,7 +45,7 @@
 
           // if the logged in user is the one who is tryin to post then query
           if ($loggedInUserId == $profileUserId) {
-            if (count(self::createNotify($postBody)) != 0) {
+            if (count(self::notify($postBody)) != 0) {
                                foreach (self::notify($postBody) as $key => $n) {
                                                $s = $loggedInUserId;
                                                $r = DB::query('SELECT id FROM users WHERE username=:username', array(':username'=>$key))[0]['id'];
@@ -72,7 +74,7 @@
           } else if(!DB::query('SELECT user_id FROM post_likess WHERE post_id=:postid AND user_id=:userid', array(':postid'=>$postId, ':userid'=>$likerId)) && !DB::query('SELECT user_id FROM post_dislikes WHERE post_id=:postid AND user_id=:userid', array(':postid'=>$postId, ':userid'=>$likerId))){
               DB::query('UPDATE posts SET likes=likes+1 WHERE id=:postid', array(':postid'=>$postId));
               DB::query('INSERT INTO post_likess VALUES(\'\', :postid, :userid)', array(':postid'=>$postId, ':userid'=>$likerId));
-              self::notify("", $postId);
+              // self::notify("", $postId);
 
           }
           else {
@@ -158,6 +160,8 @@
           $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
           $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
           // print_r($dbposts);
+          $dbprofileimg = DB::query('SELECT profileimg FROM `users` WHERE username=:username',array(':username'=>$username))[0]['profileimg'];
+          // print_r($dbprofileimg);
           $posts = '';
 
           foreach ($dbposts as $p) {
@@ -183,7 +187,14 @@
                               <?php
                                 echo '<div class="media m-0">
                                   <div class="d-flex mr-3">
-                                    <a href=""><img class="img-fluid rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/4.jpg" alt="User"></a>
+                                  ';?>
+                                    <?php if($dbprofileimg == null){
+                                      echo '<a href=""><img class="img-fluid rounded-circle" src="./img/profileplaceholder.png" alt="User"></a>';
+                                    }else{
+                                      echo '<a href=""><img class="img-fluid rounded-circle" src="'.$dbprofileimg.'" alt="User"></a>';
+                                    }?>
+                                    <?php
+                                    echo '
                                   </div>
                                   <div class="media-body" style="padding-bottom:0px;">
                                     <h6 class="m-0"><a href="profile.php?username='.$username.'" style="color:#3a9c3a; display:inline"><strong>'.$username.'</strong></a></h6>
@@ -286,16 +297,26 @@
 
       public static function displayFollowerPosts($followingposts, $userid)
       {
+
           foreach ($followingposts as $p) {
-              // print_r($p);
+            // print_r($followingposts);
+              // print_r($p['user_id']);
+                  $dbprofileimg = DB::query('SELECT profileimg FROM `users` WHERE id=:id',array(':id'=>$p['user_id']))[0]['profileimg'];
+
                   $posts = self::link_add($p['body']);
                   echo '<div class="cardbox shadow-lg bg-white">
                               <div class="cardbox-heading" style="padding-bottom:0px;">'; ?>
 
                               <?php
                                 echo '<div class="media m-0">
-                                  <div class="d-flex mr-3">
-                                    <a href=""><img class="img-fluid rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/4.jpg" alt="User"></a>
+                                  <div class="d-flex mr-3">';?>
+                                    <?php if($dbprofileimg == null){
+                                      echo '<a href=""><img class="img-fluid rounded-circle" src="./img/profileplaceholder.png" alt="User"></a>';
+                                    }else{
+                                      echo '<a href=""><img class="img-fluid rounded-circle" src="'.$dbprofileimg.'" alt="User"></a>';
+                                    }?>
+                                    <?php
+                                    echo '
                                   </div>
                                   <div class="media-body" style="padding-bottom:0px;">
                                     <h6 class="m-0"><a href="profile.php?username='.$p['username'].'" style="color:#3a9c3a; display:inline"><strong>'.$p['username'].'</strong></a></h6>
@@ -410,17 +431,18 @@
                 <div class="collapse navbar-collapse" id="navbarTop">
                   <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                      <a class="nav-link" href="profile.php?username='.$username.'"><i class=" usercircle far fa-user-circle fa-lg"></i>'.$username.'</a>
+                      <a class="nav-link " href="profile.php?username='.$username.'"><i class=" usercircle far fa-user-circle fa-lg"></i>'.$username.'</a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="index1.php">Home</a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="messages.php">Messages</a>
+                    </li>
                     <li class="nav-item ">
                       <a class="nav-link" href="joinClub.html">Clubs</a>
                     </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="joinChatrooms.html">Chatrooms</a>
-                    </li>
+
 
                     <li class="nav-item">
                       <a class="nav-link fas fa-bell fa-sx" style="
@@ -429,18 +451,22 @@
                     <li class="nav-item dropdown">
                       <a class="nav-link fas fa-caret-down fa-lg" id="navbarDropdown" role="button" data-toggle="dropdown" style="margin-top:4px;" href="#"></a>
                       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a href="editProfile.php">Edit profile</a>
+                        <a href="editProfile.php" class="nav-cl">Edit profile</a>
                         <div class="dropdown-divider"></div>
-                        <a href="createClub.html">Create club</a>
+                        <a href="createClub.html" class="nav-cl">Create club</a>
                         <div class="dropdown-divider"></div>
-                        <a href="createChatroom.html">Create chatroom</a>
+                        <a href="createChatroom.html" class="nav-cl">Create chatroom</a>
                         <div class="dropdown-divider"></div>
-                        <a href="logout.php?pageSet=true">Logout</a>
+                        <a href="logout.php?pageSet=true" class="nav-cl">Logout</a>
                       </div>
                     </li>
                   </ul>
                   <form class="form-inline ml-auto col-sm-4" style="float:right" form action="index1.php" method="post">
-                    <input type="text" class="form-control mr-sm-2" placeholder="Search" name="searchbox">
+                    <div class="searchbox">
+                    <input type="text" class="form-control mr-sm-2 sbox" placeholder="Search" name="searchbox">
+                    <ul class="list-group autocomplete" style="position:absolute; width:58.5%; z-index:1000";>
+                    </ul>
+                    </div>
                     <button type="submit" name="search" class="btn btn-outline-light">Search</button>
                   </form>
                 </div>
