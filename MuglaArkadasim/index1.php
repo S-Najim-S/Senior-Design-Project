@@ -63,6 +63,9 @@ if (isset($_POST['searchbox'])) {
     $username = DB::query('SELECT users.`username` FROM users
     WHERE users.id = '.$userid.'')[0]['username'];
 
+    $usertype = DB::query('SELECT users.`type` FROM users
+    WHERE users.id = '.$userid.'')[0]['type'];
+
 
  ?>
 
@@ -82,7 +85,7 @@ if (isset($_POST['searchbox'])) {
 
  <body style="background-color:#e9ebee;">
 
-   <?php POST::showNavBar($username,'index1.php'); ?>
+   <?php POST::showNavBar($username,'index1.php',$usertype); ?>
    <section class="hero">
      <div class="container">
        <div class="row">

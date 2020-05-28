@@ -177,6 +177,40 @@
     $('#fakeInput').val(a[a.length - 1]);
   });
 </script>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+            $('.sbox').keyup(function() {
+                    $('.autocomplete').html("")
+                    $.ajax({
+
+                            type: "GET",
+                            url: "api/search?query=" + $(this).val(),
+                            processData: false,
+                            contentType: "application/json",
+                            data: '',
+                            success: function(r) {
+                              // alert(r)
+                              r = JSON.parse(r)
+                             for (var i = 0; i < r.length; i++) {
+                                     console.log(r[i].body)
+                                     $('.autocomplete').html(
+                                                    $('.autocomplete').html() +
+                                                    '<a href="profile.php?username='+r[i].username+'"><li class="list-group-item"><span>'+r[i].body+'</span></li></a>'
+                                            )
+                                   }
+                            },
+                            error: function(r){
+                              console.log(r);
+                            }
+                          })
+                        })
+                      })
+
+                      </script>
+
 </body>
 
 </html>

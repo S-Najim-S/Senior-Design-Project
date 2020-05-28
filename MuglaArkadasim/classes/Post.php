@@ -163,6 +163,7 @@
           $dbprofileimg = DB::query('SELECT profileimg FROM `users` WHERE username=:username',array(':username'=>$username))[0]['profileimg'];
           // print_r($dbprofileimg);
           $posts = '';
+          $n = 0;
 
           foreach ($dbposts as $p) {
 
@@ -170,7 +171,7 @@
                   // $postsImage = ."<img style='margin-top:20px' height='100%' width='100%' src='".$p['postimg']."'>"
 
                   echo '<div class="cardbox shadow-lg bg-white">
-                              <div class="cardbox-heading" style="padding-bottom:0px;">'; ?>
+                              <div class="cardbox-heading" style="padding-bottom:0px;" id="'.$n++.'">'; ?>
 
                                 <?php
                                 if ($userid == $loggedInUserId) {
@@ -418,7 +419,7 @@
       }
     }
 
-      public static function showNavBar($username,$address)
+      public static function showNavBar($username,$address,$usertype)
       {
           echo '  <div class="bs-example">
               <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -451,10 +452,13 @@
                     <li class="nav-item dropdown">
                       <a class="nav-link fas fa-caret-down fa-lg" id="navbarDropdown" role="button" data-toggle="dropdown" style="margin-top:4px;" href="#"></a>
                       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a href="editProfile.php" class="nav-cl">Edit profile</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="createClub.html" class="nav-cl">Create club</a>
-                        <div class="dropdown-divider"></div>
+                        <a href="editProfile.php" class="nav-cl">Edit profile</a>';?>
+                        <?php if($usertype == 'staff')
+
+                        echo '<div class="dropdown-divider"></div>
+                        <a href="createClub.html" class="nav-cl">Create club</a>';
+                        ?>
+                        <?php echo '<div class="dropdown-divider"></div>
                         <a href="createChatroom.html" class="nav-cl">Create chatroom</a>
                         <div class="dropdown-divider"></div>
                         <a href="logout.php?pageSet=true" class="nav-cl">Logout</a>
