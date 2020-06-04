@@ -441,7 +441,7 @@
                       <a class="nav-link" href="messages.php">Messages</a>
                     </li>
                     <li class="nav-item ">
-                      <a class="nav-link" href="joinClub.html">Clubs</a>
+                      <a class="nav-link" href="createClub.php">Clubs</a>
                     </li>
 
 
@@ -456,7 +456,7 @@
                         <?php if($usertype == 'staff')
 
                         echo '<div class="dropdown-divider"></div>
-                        <a href="createClub.html" class="nav-cl">Create club</a>';
+                        <a href="createClub.php" class="nav-cl">Create club</a>';
                         ?>
                         <?php echo '<div class="dropdown-divider"></div>
                         <a href="createChatroom.html" class="nav-cl">Create chatroom</a>

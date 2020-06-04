@@ -1,5 +1,16 @@
 <?php
-  include('classes/DB.php');
+  include('./classes/DB.php');
+  include('./classes/Login.php');
+  include('./classes/Post.php');
+  include('./classes/Image.php');
+  $userid = Login::isLoggedIn();
+
+  $loggedInUserName = DB::query('SELECT login_tokens.user_id, users.`username` FROM users,login_tokens
+    WHERE users.id = login_tokens.user_id')[0]['username'];
+    $profileimg = DB::query('SELECT profileimg FROM `users` WHERE username=:username',array(':username'=>$loggedInUserName))[0]['profileimg'];
+    $email = DB::query('SELECT email FROM `users` WHERE username=:username',array(':username'=>$loggedInUserName))[0]['email'];
+    $usertype = DB::query('SELECT users.`type` FROM users
+    WHERE users.id = '.$userid.'')[0]['type'];
 
   $pdo = new PDO('mysql:127.0.0.1=localhost;dbname=mynetwork;chartset=utf8', 'root', '');
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -7,16 +18,20 @@
   $success = false;
   $clubName = '';
   $clubDesc = '';
+  $adminId = Login::isLoggedIn();
 
   if (isset($_POST['createclub'])) {
       $clubName = $_POST['cName'];
       $clubDesc = $_POST['cDescription'];
 
-      // Check if user exists
+
+      // Check if Club exists
       if (!DB::query('SELECT cName FROM clubs WHERE cName=:cName', array(':cName'=>$clubName))) {
 
           // Insert Fields into the database and the password as hash value
-          DB::query('INSERT INTO clubs VALUES(\'\', :cName, :cDescription)', array(':cName'=>$clubName,':cDescription'=>$clubDesc));
+          DB::query('INSERT INTO clubs VALUES(\'\', :cName, :cDescription, \'\',:adminId)', array(':cName'=>$clubName,':cDescription'=>$clubDesc, ':adminId'=>$adminId));
+          $clubid = DB::query('SELECT id FROM clubs WHERE adminId=:adminId ORDER BY ID DESC LIMIT 1;', array(':adminId'=>$userid))[0]['id'];
+          Image::uploadImage('clubimg', "UPDATE clubs SET clubImage = :clubimg WHERE id=:clubid", array(':clubid'=>$clubid));
           $success = true;
       } else {
           $errors['cName'] = "Club already exists";
@@ -41,54 +56,7 @@
 
  <body>
 
-   <div class="navbar-div">
-     <nav class="navbar navbar-expand-md navbar-dark bg-blue">
-       <a class="navbar-brand logo" href="#">MuglaArkadasim</a>
-       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-         <span class="navbar-toggler-icon"></span>
-       </button>
-
-       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-         <ul class="navbar-nav mx-auto">
-           <li class="nav-item ">
-             <a class="nav-link" href="userTimeline.html"><i class=" usercircle far fa-user-circle fa-lg"></i> User_name</a>
-           </li>
-           <li class="nav-item active">
-             <a class="nav-link" href="homepage.html">Home</a>
-           </li>
-           <li class="nav-item ">
-             <a class="nav-link" href="joinClub.html">Clubs</a>
-           </li>
-           <li class="nav-item">
-             <a class="nav-link" href="joinChatrooms.html">Chatrooms</a>
-           </li>
-
-           <li class="nav-item">
-             <a class="nav-link fas fa-bell fa-sx" style="
-     margin-top:4px;" href="#"></a>
-           </li>
-           <li class="nav-item dropdown">
-             <a class="nav-link fas fa-caret-down fa-lg" id="navbarDropdown" role="button" data-toggle="dropdown" style="margin-top:4px;" href="#"></a>
-             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-               <a href="editProfile.html">Edit profile</a>
-               <div class="dropdown-divider"></div>
-               <a href="createClub.html">Create club</a>
-               <div class="dropdown-divider"></div>
-               <a href="createChatroom.html">Create chatroom</a>
-               <div class="dropdown-divider"></div>
-               <a href="index.html">Logout</a>
-             </div>
-           </li>
-         </ul>
-
-         <form class="form-inline">
-           <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-           <button class="btn btn-light my-sm-0" type="submit">Search</button>
-         </form>
-       </div>
-     </nav>
-   </div>
-
+   <?php Post::showNavBar($loggedInUserName, 'profile.php?username='.$loggedInUserName, $usertype); ?>
 
    <div class="container mt-5">
      <div class="row">
@@ -98,8 +66,12 @@
        </div>
        <!-- Profile Settings-->
        <div class="col-lg-8 pb-5">
-         <form class="row" action="createclub.php" method="post">
+         <form class="row" action="createclub.php" method="post" enctype="multipart/form-data">
            <div class="col-md-6">
+             <div class="form-group">
+               <label for="account-cln">Upload club profile</label>
+              <input type="file" class="btn btn-success mt-2 px-3" name="clubimg" id="file" style=""></input>
+             </div>
              <div class="form-group">
                <label for="account-cln">Name your club</label>
                <input class="form-control" type="text" name="cName" placeholder="Enter clubs name" required="">

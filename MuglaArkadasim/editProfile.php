@@ -11,6 +11,8 @@
     WHERE users.id = login_tokens.user_id')[0]['username'];
     $profileimg = DB::query('SELECT profileimg FROM `users` WHERE username=:username',array(':username'=>$loggedInUserName))[0]['profileimg'];
     $email = DB::query('SELECT email FROM `users` WHERE username=:username',array(':username'=>$loggedInUserName))[0]['email'];
+    $usertype = DB::query('SELECT users.`type` FROM users
+    WHERE users.id = '.$userid.'')[0]['type'];
     $created_at = DB::query('SELECT users.created_at FROM users
       WHERE username=:username', array(':username'=>$loggedInUserName))[0]['created_at'];
   // Using Login:: to refrence the function
@@ -85,7 +87,7 @@
 
 <body>
 
-  <?php Post::showNavBar($loggedInUserName, 'profile.php?username='.$loggedInUserName); ?>
+  <?php Post::showNavBar($loggedInUserName, 'profile.php?username='.$loggedInUserName, $usertype); ?>
 
   <div class="container mt-5">
     <div class="row">

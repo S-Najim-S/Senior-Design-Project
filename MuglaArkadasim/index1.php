@@ -6,50 +6,50 @@
   include('./classes/Post.php');
 
 
-  $showTimeline = False;
+  $showTimeline = false;
   $dislik = isset($_POST['dislike']);
   $like = isset($_POST['like']);
 
   // Using Login:: to refrence the function
   if (Login::isLoggedIn()) {
-    $userid = Login::isLoggedIn();
-    $showTimeline = True;
+      $userid = Login::isLoggedIn();
+      $showTimeline = true;
   } else {
-    die("Not Logged in");
+      die("Not Logged in");
   }
 
   if (isset($_GET['postid']) && $dislik == 0) {
-      Post::likePost($_GET['postid'],$userid);
-}
+      Post::likePost($_GET['postid'], $userid);
+  }
 
 if (isset($_GET['postid']) && isset($_POST['dislike'])) {
-    Post::dislikePost($_GET['postid'],$userid);
+    Post::dislikePost($_GET['postid'], $userid);
 }
 
 if (isset($_POST['searchbox'])) {
-      $tosearch = explode(" ", $_POST['searchbox']);
-      if (count($tosearch) == 1) {
-              $tosearch = str_split($tosearch[0], 2);
-      }
-      $whereclause = "";
-      $paramsarray = array(':username'=>'%'.$_POST['searchbox'].'%');
-      for ($i = 0; $i < count($tosearch); $i++) {
-              $whereclause .= " OR username LIKE :u$i ";
-              $paramsarray[":u$i"] = $tosearch[$i];
-      }
-      $users = DB::query('SELECT users.username FROM users WHERE users.username LIKE :username '.$whereclause.'', $paramsarray);
-      print_r($users);
+    $tosearch = explode(" ", $_POST['searchbox']);
+    if (count($tosearch) == 1) {
+        $tosearch = str_split($tosearch[0], 2);
+    }
+    $whereclause = "";
+    $paramsarray = array(':username'=>'%'.$_POST['searchbox'].'%');
+    for ($i = 0; $i < count($tosearch); $i++) {
+        $whereclause .= " OR username LIKE :u$i ";
+        $paramsarray[":u$i"] = $tosearch[$i];
+    }
+    $users = DB::query('SELECT users.username FROM users WHERE users.username LIKE :username '.$whereclause.'', $paramsarray);
+    print_r($users);
 
-      $whereclause = "";
-      $paramsarray = array(':body'=>'%'.$_POST['searchbox'].'%');
-      for ($i = 0; $i < count($tosearch); $i++) {
-              if ($i % 2) {
-              $whereclause .= " OR body LIKE :p$i ";
-              $paramsarray[":p$i"] = $tosearch[$i];
-              }
-      }
-      $posts = DB::query('SELECT posts.body FROM posts WHERE posts.body LIKE :body '.$whereclause.'', $paramsarray);
-      // echo '<pre>';
+    $whereclause = "";
+    $paramsarray = array(':body'=>'%'.$_POST['searchbox'].'%');
+    for ($i = 0; $i < count($tosearch); $i++) {
+        if ($i % 2) {
+            $whereclause .= " OR body LIKE :p$i ";
+            $paramsarray[":p$i"] = $tosearch[$i];
+        }
+    }
+    $posts = DB::query('SELECT posts.body FROM posts WHERE posts.body LIKE :body '.$whereclause.'', $paramsarray);
+    // echo '<pre>';
       // print_r($posts);
       // echo '</pre>';
 }
@@ -85,7 +85,7 @@ if (isset($_POST['searchbox'])) {
 
  <body style="background-color:#e9ebee;">
 
-   <?php POST::showNavBar($username,'index1.php',$usertype); ?>
+   <?php POST::showNavBar($username, 'index1.php', $usertype); ?>
    <section class="hero">
      <div class="container">
        <div class="row">
@@ -143,12 +143,15 @@ if (isset($_POST['searchbox'])) {
                                 data: '',
                                 success: function(r) {
                                   // alert(r)
+                                  alert(r)
+                                  //
                                   r = JSON.parse(r)
+                                  alert(r)
                                  for (var i = 0; i < r.length; i++) {
-                                         console.log(r[i].body)
+                                         alert(r[i].body)
                                          $('.autocomplete').html(
                                                         $('.autocomplete').html() +
-                                                        '<li class="list-group-item"><span>'+r[i].body+'</span></li>'
+                                                        '<a href="profile.php?username='+r[i].username+'#'+r[i].id+'"><li class="list-group-item"><span>'+r[i].body+'</span></li></a>'
                                                 )
                                        }
                                 },
@@ -158,7 +161,6 @@ if (isset($_POST['searchbox'])) {
                               })
                             })
                           })
-
                           </script>
 
 

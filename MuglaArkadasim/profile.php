@@ -10,7 +10,10 @@
   } else {
     die("Not Logged in");
   }
+  $userid = Login::isLoggedIn();
 
+  $usertype = DB::query('SELECT users.`type` FROM users
+  WHERE users.id = '.$userid.'')[0]['type'];
   $username = '';
   $isFollowing = false;
   $loggedInUserId = Login::isLoggedIn();
@@ -105,7 +108,7 @@
 </head>
 
 <body style="background-color:#e9ebee;">
-  <?php POST::showNavBar($loggedInUserName, 'profile.php?username='.$username); ?>
+  <?php POST::showNavBar($loggedInUserName, 'profile.php?username='.$username, $usertype); ?>
   <section class="hero">
     <div class="container">
       <div class="row">

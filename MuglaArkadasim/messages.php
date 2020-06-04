@@ -7,8 +7,11 @@
   include('./classes/TimeConv.php');
   include('./classes/Image.php');
 
+  $userid = Login::isLoggedIn();
   $loggedInUserName = DB::query('SELECT login_tokens.user_id, users.`username` FROM users,login_tokens
     WHERE users.id = login_tokens.user_id')[0]['username'];
+    $usertype = DB::query('SELECT users.`type` FROM users
+    WHERE users.id = '.$userid.'')[0]['type'];
 
   if (Login::isLoggedIn()) {
   } else {
@@ -35,7 +38,7 @@
 </head>
 
 <body>
-  <?php POST::showNavBar($loggedInUserName, 'profile.php?username='.$loggedInUserName); ?>
+  <?php POST::showNavBar($loggedInUserName, 'profile.php?username='.$loggedInUserName, $usertype); ?>
     <div class="container">
         <h1>My Messages</h1></div>
     <div>
