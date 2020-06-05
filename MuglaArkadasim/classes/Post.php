@@ -152,12 +152,20 @@
 
           return $newstring;
       }
+      public static function displayClubs()
+      {
+
+      // $dbposts creates an array of posts and then to print each post we loop through it.
+          $dbposts = DB::query('SELECT * FROM clubs ORDER BY id DESC');
+          // print_r($dbposts);
+          $dbprofileimg = DB::query('SELECT clubImage FROM `clubs` WHERE cName=:cName')[0]['clubImage'];
+          // print_r($dbprofileimg);
+        }
 
       public static function displayPosts($userid, $username, $loggedInUserId)
       {
 
       // $dbposts creates an array of posts and then to print each post we loop through it.
-          $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
           $dbposts = DB::query('SELECT * FROM posts WHERE user_id=:userid ORDER BY id DESC', array(':userid'=>$userid));
           // print_r($dbposts);
           $dbprofileimg = DB::query('SELECT profileimg FROM `users` WHERE username=:username',array(':username'=>$username))[0]['profileimg'];
@@ -168,7 +176,6 @@
           foreach ($dbposts as $p) {
 
                   $posts = self::link_add($p['body']);
-                  // $postsImage = ."<img style='margin-top:20px' height='100%' width='100%' src='".$p['postimg']."'>"
 
                   echo '<div class="cardbox shadow-lg bg-white">
                               <div class="cardbox-heading" style="padding-bottom:0px;" id="'.$n++.'">'; ?>
@@ -298,9 +305,10 @@
 
       public static function displayFollowerPosts($followingposts, $userid)
       {
+        // print_r($followingposts);
 
           foreach ($followingposts as $p) {
-            // print_r($followingposts);
+            // print_r($p['user_id']);
               // print_r($p['user_id']);
                   $dbprofileimg = DB::query('SELECT profileimg FROM `users` WHERE id=:id',array(':id'=>$p['user_id']))[0]['profileimg'];
 
@@ -321,7 +329,7 @@
                                   </div>
                                   <div class="media-body" style="padding-bottom:0px;">
                                     <h6 class="m-0"><a href="profile.php?username='.$p['username'].'" style="color:#3a9c3a; display:inline"><strong>'.$p['username'].'</strong></a></h6>
-                                    <small><span><i class="icon ion-md-time"></i> '.TimeConv::timeSpan($p['posted_at']).'</span></small>
+                                    <small><span><i class="icon ion-md-time"></i>'.TimeConv::timeSpan($p['posted_at']).'</span></small>
                                     <hr />
                                   </div>
                                 </div>
@@ -414,8 +422,6 @@
                               </div>
 
                             </div>';
-
-          // return $posts;
       }
     }
 
@@ -441,7 +447,7 @@
                       <a class="nav-link" href="messages.php">Messages</a>
                     </li>
                     <li class="nav-item ">
-                      <a class="nav-link" href="createClub.php">Clubs</a>
+                      <a class="nav-link" href="clubs.php">Clubs</a>
                     </li>
 
 
@@ -459,8 +465,6 @@
                         <a href="createClub.php" class="nav-cl">Create club</a>';
                         ?>
                         <?php echo '<div class="dropdown-divider"></div>
-                        <a href="createChatroom.html" class="nav-cl">Create chatroom</a>
-                        <div class="dropdown-divider"></div>
                         <a href="logout.php?pageSet=true" class="nav-cl">Logout</a>
                       </div>
                     </li>

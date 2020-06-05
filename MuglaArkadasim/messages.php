@@ -67,7 +67,7 @@
     <script src="assets/js/bs-animation.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.1.1/aos.js"></script>
     <script type="text/javascript">
-    SENDER = 3;
+    SENDER = 2;
     function getUsername() {
             $.ajax({
 

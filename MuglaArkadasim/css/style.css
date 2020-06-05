@@ -273,3 +273,11 @@ hr{
 .nav-cl{
   color: #555 !important;
 }
+.club-boxes{
+  display: inline-block;
+  float: left;
+  margin-right: 40px
+}
+.txt{
+  margin-top: 10px;
+}

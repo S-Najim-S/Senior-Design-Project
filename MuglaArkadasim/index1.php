@@ -90,7 +90,8 @@ if (isset($_POST['searchbox'])) {
      <div class="container">
        <div class="row">
          <div class="col-lg-6 offset-lg-3">
-         <?php    Post::displayFollowerPosts($followingposts, $userid) ?>
+         <?php Post::displayFollowerPosts($followingposts, $userid)
+          ?>
 
           </div>
 
@@ -142,13 +143,8 @@ if (isset($_POST['searchbox'])) {
                                 contentType: "application/json",
                                 data: '',
                                 success: function(r) {
-                                  // alert(r)
-                                  alert(r)
-                                  //
                                   r = JSON.parse(r)
-                                  alert(r)
                                  for (var i = 0; i < r.length; i++) {
-                                         alert(r[i].body)
                                          $('.autocomplete').html(
                                                         $('.autocomplete').html() +
                                                         '<a href="profile.php?username='+r[i].username+'#'+r[i].id+'"><li class="list-group-item"><span>'+r[i].body+'</span></li></a>'

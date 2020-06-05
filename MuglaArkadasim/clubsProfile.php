@@ -31,33 +31,10 @@
 
   // Check the link if the username is passed
   if (isset($_GET['username'])) {
-      if (DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$_GET['username']))) {
+      if (DB::query('SELECT adminid FROM users WHERE username=:username', array(':username'=>$_GET['username']))) {
           $username = DB::query('SELECT username FROM users WHERE username=:username', array(':username'=>$_GET['username']))[0]['username'];
           $userid = DB::query('SELECT id FROM users WHERE username=:username', array(':username'=>$_GET['username']))[0]['id'];
           $followerid = Login::isLoggedIn();
-
-          if (isset($_POST['follow'])) {
-              if ($userid != $followerid) {
-                  if (!DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
-                      DB::query('INSERT INTO followers VALUES (\'\', :userid, :followerid)', array(':userid'=>$userid, ':followerid'=>$followerid));
-                  } else {
-                      // echo "Already FOllowing!";
-                  }
-                  $isFollowing = true;
-              }
-          }
-          if (isset($_POST['unfollow'])) {
-              if ($userid != $followerid) {
-                  if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
-                      DB::query('DELETE FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid));
-                  }
-                  $isFollowing = false;
-              }
-          }
-          if (DB::query('SELECT follower_id FROM followers WHERE user_id=:userid AND follower_id=:followerid', array(':userid'=>$userid, ':followerid'=>$followerid))) {
-              //echo 'Already following!';
-              $isFollowing = true;
-          }
 
           if (isset($_POST['deletepost'])) {
             if (DB::query('SELECT id FROM posts WHERE id=:postid AND user_id=:userid', array(':postid'=>$_GET['postid'], ':userid'=>$followerid))) {
@@ -108,7 +85,7 @@
 </head>
 
 <body style="background-color:#e9ebee;">
-  <?php POST::showNavBar($loggedInUserName, 'profile.php?username='.$username, $usertype); ?>
+  <?php POST::showNavBar($loggedInUserName, 'clubs.php?admin='.$username, $usertype); ?>
   <section class="hero">
     <div class="container">
       <div class="row">
@@ -127,27 +104,22 @@
     } ?>
 
     <div class="col-lg-6 offset-lg-3">
-        <?php $posts = Post::displayPosts($userid, $username, $followerid); ?>
+        <?php  // $posts = Post::displayPosts($userid, $username, $followerid); ?>
 
       </div>
       <div class="col-lg-3">
-        <form class="" action="profile.php?username=<?php echo $username;?>" method="post">
-          <?php
-          if($userid != $followerid){
-            if ($isFollowing) {
-                echo '<div class="d-flex flex-wrap justify-content-between align-items-center col-sm" style="margin-bottom:10px; margin-left:15px;">';
-                echo '<input type="submit" name="unfollow" value="          Unfollow          " class="btn btn-style-1 btn-success">';
-                echo '</div>';
-            } else {
-              echo '<div class="d-flex flex-wrap justify-content-between align-items-center col-sm" style="margin-bottom:10px; margin-left:15px;">';
-              echo '<input type="submit" name="follow" value="            Follow          " class="btn btn-style-1 btn-success">';
-              echo '</div>';
-            }
-            }
-           ?>
-        </form>
+
         <!-- Clubs Section -->
-      
+        <div class="shadow-lg p-4 mb-2 bg-white author">
+          <a href="http://www.themashabrand.com/">Get more from themashabrand.com</a>
+          <p>Bootstrap 4.1.0</p>
+        </div>
+
+        <!-- Chatrooms Section -->
+          <div class="shadow-lg p-4 mb-2 bg-white author">
+            <a href="http://www.themashabrand.com/">Get more from themashabrand.com</a>
+            <p>Bootstrap 4.1.0</p>
+          </div>
         <!--/ col-lg-3 -->
       </div>
       <!--/ col-lg-3 -->
